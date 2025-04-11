@@ -15,19 +15,37 @@
 * Essential
     * OCR implementation and pages to manually enter past income and expenses
     * Show a chart of percentage expenses by expense category
+    * Server to hold expense data
+    * Dashboard for navigation
 * Nice-to-Have
     * Automatically calculate supposed wealth and compare it to a user statement of wealth to alert for unaccounted incomes/expenditures
     * Comparison to a statistic based/user desired normal expense chart, and highlight overspending/underspending per category.
     * Calculators to simulate future wealth if investments are made (stocks, savings, etc.)
+    * Login/Account feature using server
 * Stretch
     * Web-scraping for stock information to recommend investment options with liquid assets
     * Chatbot companion to help navigate the app
     * Combo of Financial Advisor and Fantasy Football Assistant
 
 ## Project Architecture
-
+* Dashboard with feature buttons
+* Page for each feature
+* Expense data server
+* Nice-to-Have
+    * Login screen
+    * Server to hold login/account information
+    * Other feature buttons from Nice-to-Have
 
 ## Development Schedule
+* Discussing data specificity/what data we want to measure
+* OCR implementation (parallel1)
+* Chart development (parallel1)
+* Data server (parallel2)
+* Dashboard (UI) (parallel2)
+* Nice-to-Have
+    * Dashboard additions from Nice-to-Have features
+    * Login/Account server
+    * Better UI (light/dark mode) (parallel to everything)
 
 ## Concerns
 * SCALE
@@ -41,5 +59,7 @@
 * Meet before/after class briefly
 
 ## Contribution Plan
-* 
+* Sit next to each other in class to feel the resentment from the other person
+* Discuss weekly contributions during meeting times
+* Add more to this plan as the term progresses
 
