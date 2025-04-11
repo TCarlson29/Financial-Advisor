@@ -38,11 +38,11 @@
 
 ## Development Schedule
 * Discussing data specificity/what data we want to measure
-* OCR implementation (parallel1)
-* Chart development (parallel1)
-* Data server (parallel2)
-* Dashboard (UI) (parallel2)
-* Nice-to-Have
+* OCR implementation (parallel1) (by week 4)
+* Chart development (parallel1) (by week 4)
+* Data server (parallel2) (by week 7)
+* Dashboard (UI) (parallel2) (by week 7)
+* Nice-to-Have (if time)
     * Dashboard additions from Nice-to-Have features
     * Login/Account server
     * Better UI (light/dark mode) (parallel to everything)
