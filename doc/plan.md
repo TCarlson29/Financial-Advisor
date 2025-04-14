@@ -7,20 +7,21 @@
 
 ## Learning Goals
 * Front-end development with React/Node/Vue/etc.
-* Server implementations in Java or some other PLs
+* Server implementations in Java or some other PLs (Linux server most likely; FastAPI if Python server)
 * Money handling skills and algorithms
 * Back-end development with new PLs (Rust, etc.)
 
 ## Feature Goals
 * Essential
-    * OCR implementation and pages to manually enter past income and expenses
+    * pages to manually enter past income and expenses
     * Show a chart of percentage expenses by expense category
-    * Server to hold expense data
-    * Dashboard for navigation
+    * Dashboard for navigation (using Vue)
 * Nice-to-Have
+    * OCR implementation
     * Automatically calculate supposed wealth and compare it to a user statement of wealth to alert for unaccounted incomes/expenditures
     * Comparison to a statistic based/user desired normal expense chart, and highlight overspending/underspending per category.
     * Calculators to simulate future wealth if investments are made (stocks, savings, etc.)
+    * Server to hold expense data
     * Login/Account feature using server
 * Stretch
     * Web-scraping for stock information to recommend investment options with liquid assets
@@ -38,8 +39,11 @@
 
 ## Development Schedule
 * Discussing data specificity/what data we want to measure
-* OCR implementation (parallel1) (by week 4)
+* Tool setup, Hello World basics, Database w trivial content, home page template, server talks w file system and database (by week 4)
+    * FastAPI of Python for server; 
+* Database Design (by week 4)
 * Chart development (parallel1) (by week 4)
+* OCR implementation (parallel1)
 * Data server (parallel2) (by week 7)
 * Dashboard (UI) (parallel2) (by week 7)
 * Nice-to-Have (if time)
