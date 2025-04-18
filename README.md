@@ -1,6 +1,7 @@
 # Financial-Advisor
 
 Base tutorial: https://testdriven.io/blog/developing-a-single-page-app-with-fastapi-and-vuejs/
+(Done up until the Routing section)
 
 Now, when you make changes to the models, you can run the following commands to update the database:
 
