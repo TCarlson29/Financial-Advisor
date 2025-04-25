@@ -29,7 +29,6 @@ async function deleteTask(id) {
         const response = await fetch(`http://localhost:3001/api/tasks/${id}`, requestOptions);
 
         if (response.ok) {
-            // Eğer yanıt durumu OK (204) ise, yerel todos'u güncelle
             records.value = records.value.filter((t) => t.id !== id);
         } else {
             console.error("Görev silinirken hata oluştu:", response.statusText);
