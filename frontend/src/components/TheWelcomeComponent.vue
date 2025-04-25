@@ -1,16 +1,16 @@
 <template>
     <div id='theContainer'>
       <h1> Welcome</h1>
-      <h2>  Mert's To Do App  </h2>
+      <h2>  Financial Advisor  </h2>
       <router-link to="/todo-app">
-        <button style="margin: 23px; width: 24%;">View</button>
+        <button style="margin: 23px; width: 24%;">Open</button>
       </router-link>
     </div>
   </template>
   
   <style>
   body {
-    background: linear-gradient(135deg, #153575, #4e085f);
+    background: linear-gradient(135deg, #157525, #bdd509);
   }
   #theContainer {
     text-align: center;
