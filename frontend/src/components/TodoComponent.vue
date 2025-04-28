@@ -13,7 +13,8 @@ async function createTask(text) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: text })
         };
-        const response = await fetch('http://localhost:3001/api/tasks', requestOptions)
+        const BASE = import.meta.env.VITE_API_BASE_URL
+        const response = await fetch(`${BASE}/api/tasks`, requestOptions)
         return await response.json();
     } catch (error) {
         console.error(error);
@@ -26,7 +27,8 @@ async function deleteTask(id) {
         const requestOptions = {
             method: "DELETE",
         };
-        const response = await fetch(`http://localhost:3001/api/tasks/${id}`, requestOptions);
+        const BASE = import.meta.env.VITE_API_BASE_URL
+        const response = await fetch(`${BASE} /api/tasks/${id} `, requestOptions);
 
         if (response.ok) {
             // Eğer yanıt durumu OK (204) ise, yerel todos'u güncelle
@@ -41,15 +43,15 @@ async function deleteTask(id) {
 
 
 async function addTodo() {
-  console.log('Submitting new task:', newTodo.value)
-  const newTask = await createTask(newTodo.value)
-  if (newTask) {
-    console.log('Response from backend:', newTask)
-    todos.value.push(newTask)
-  } else {
-    console.warn('No task returned from backend.')
-  }
-  newTodo.value = ''
+    console.log('Submitting new task:', newTodo.value)
+    const newTask = await createTask(newTodo.value)
+    if (newTask) {
+        console.log('Response from backend:', newTask)
+        todos.value.push(newTask)
+    } else {
+        console.warn('No task returned from backend.')
+    }
+    newTodo.value = ''
 }
 
 async function removeTodo(todo) {
@@ -63,7 +65,8 @@ onMounted(async () => {
 
 async function fetchTasks() {
     try {
-        const response = await fetch('http://localhost:3001/api/tasks');
+        const BASE = import.meta.env.VITE_API_BASE_URL
+        const response = await fetch(`${BASE}/api/tasks`)
         todos.value = await response.json();
     } catch (error) {
         console.error(error);
