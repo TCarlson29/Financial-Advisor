@@ -1,3 +1,4 @@
+# main.py
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -7,9 +8,7 @@ from database import SessionLocal, engine
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-# CORS (adjust origins to your frontend)
-app.add_middleware(
+app.add_middleware(  # same CORS as before
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
     allow_credentials=True,
@@ -17,23 +16,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Dependency to get DB session
 def get_db():
     db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    try: yield db
+    finally: db.close()
 
-@app.get("/api/tasks", response_model=list[schemas.TaskRead])
-def read_tasks(db: Session = Depends(get_db)):
-    return crud.get_tasks(db)
+@app.get("/api/activities", response_model=list[schemas.ActivityRead])
+def read_activities(db: Session = Depends(get_db)):
+    return crud.get_activities(db)
 
-@app.post("/api/tasks", response_model=schemas.TaskRead)
-def create_task(task: schemas.TaskCreate, db: Session = Depends(get_db)):
-    return crud.create_task(db, task)
+@app.post("/api/activities", response_model=schemas.ActivityRead)
+def create_activity(act: schemas.ActivityCreate, db: Session = Depends(get_db)):
+    return crud.create_activity(db, act)
 
-@app.delete("/api/tasks/{task_id}", status_code=204)
-def delete_task(task_id: int, db: Session = Depends(get_db)):
-    if not crud.delete_task(db, task_id):
-        raise HTTPException(status_code=404, detail="Task not found")
+@app.delete("/api/activities/{act_id}", status_code=204)
+def delete_activity(act_id: int, db: Session = Depends(get_db)):
+    if not crud.delete_activity(db, act_id):
+        raise HTTPException(status_code=404, detail="Activity not found")

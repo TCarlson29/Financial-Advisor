@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, String
+# models.py
+from sqlalchemy import Column, Integer, String, Float
 from database import Base
 
-class Task(Base):
-    __tablename__ = "tasks"
-
-    id   = Column(Integer, primary_key=True, index=True)
-    text = Column(String, nullable=False)
+class Activity(Base):
+    __tablename__ = "activities"
+    id     = Column(Integer, primary_key=True, index=True)
+    name   = Column(String,  nullable=False)
+    amount = Column(Float,   nullable=False)

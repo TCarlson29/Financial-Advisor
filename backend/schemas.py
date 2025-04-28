@@ -1,10 +1,11 @@
+# schemas.py
 from pydantic import BaseModel
 
-class TaskCreate(BaseModel):
-    text: str
+class ActivityCreate(BaseModel):
+    name: str
+    amount: float
 
-class TaskRead(TaskCreate):
+class ActivityRead(ActivityCreate):
     id: int
-
     class Config:
         orm_mode = True
