@@ -1,6 +1,7 @@
 # Financial-Advisor
 
 To use: 
+download venv
 at root, activate .venv: .\.venv\Scripts\activate.bat
 (only once needed for every run now and future) pip install -r requirements.txt
 
