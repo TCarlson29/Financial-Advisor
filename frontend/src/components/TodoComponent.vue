@@ -39,7 +39,7 @@ onMounted(async () => {
 
 // GET activities
 async function fetchActivities() {
-    const res = await fetch('http://ocalhost:8000/api/activities')
+    const res = await fetch('http://localhost:8000/api/activities')
     activities.value = await res.json()
 }
 </script>
