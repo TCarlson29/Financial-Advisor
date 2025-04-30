@@ -13,7 +13,8 @@ async function createTask(text) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: text })
         };
-        const response = await fetch('http://localhost:3001/api/tasks', requestOptions)
+        const BASE = import.meta.env.VITE_API_BASE_URL
+        const response = await fetch(`${BASE}/api/tasks`, requestOptions)
         return await response.json();
     } catch (error) {
         console.error(error);
@@ -26,7 +27,8 @@ async function deleteTask(id) {
         const requestOptions = {
             method: "DELETE",
         };
-        const response = await fetch(`http://localhost:3001/api/tasks/${id}`, requestOptions);
+        const BASE = import.meta.env.VITE_API_BASE_URL
+        const response = await fetch(`${BASE}/api/tasks`, requestOptions);
 
         if (response.ok) {
             records.value = records.value.filter((t) => t.id !== id);
@@ -62,7 +64,8 @@ onMounted(async () => {
 
 async function fetchTasks() {
     try {
-        const response = await fetch('http://localhost:3001/api/tasks');
+        const BASE = import.meta.env.VITE_API_BASE_URL
+        const response = await fetch(`${BASE}/api/tasks`)
         records.value = await response.json();
     } catch (error) {
         console.error(error);

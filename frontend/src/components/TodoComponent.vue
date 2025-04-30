@@ -2,90 +2,74 @@
 import { onMounted, ref } from 'vue'
 
 let id = 0
-const newTodo = ref('')
-const todos = ref([])
+const newName = ref('')
+const newAmount = ref(0)
+const activities = ref([])
 
-// Add Item via FETCH API
-async function createTask(text) {
-    try {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: text })
-        };
-        const response = await fetch('http://localhost:3001/api/tasks', requestOptions)
-        return await response.json();
-    } catch (error) {
-        console.error(error);
+// POST activity
+async function createActivity(name, amount) {
+    const opts = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, amount })
     }
+    return fetch('http://localhost:8000/api/activities', opts).then(r => r.json())
 }
 
-// FETCH API üzerinden öğe silme
-async function deleteTask(id) {
-    try {
-        const requestOptions = {
-            method: "DELETE",
-        };
-        const response = await fetch(`http://localhost:3001/api/tasks/${id}`, requestOptions);
-
-        if (response.ok) {
-            // Eğer yanıt durumu OK (204) ise, yerel todos'u güncelle
-            todos.value = todos.value.filter((t) => t.id !== id);
-        } else {
-            console.error("Görev silinirken hata oluştu:", response.statusText);
-        }
-    } catch (error) {
-        console.error(error);
-    }
+// DELETE activity
+async function deleteActivity(id) {
+    await fetch(`http://localhost:8000/api/activities/${id}`, { method: 'DELETE' })
+    activities.value = activities.value.filter(a => a.id !== id)
 }
 
-
-async function addTodo() {
-  console.log('Submitting new task:', newTodo.value)
-  const newTask = await createTask(newTodo.value)
-  if (newTask) {
-    console.log('Response from backend:', newTask)
-    todos.value.push(newTask)
-  } else {
-    console.warn('No task returned from backend.')
-  }
-  newTodo.value = ''
+async function addActivity() {
+  const newAct = await createActivity(newName.value, newAmount.value)
+  activities.value.push(newAct)
+  newName.value = ''
+  newAmount.value = 0
 }
 
-async function removeTodo(todo) {
-    await deleteTask(todo.id)
-    todos.value = todos.value.filter((t) => t.id !== todo.id)
+async function removeActivity(id) {
+  await deleteActivity(id)
 }
 
 onMounted(async () => {
-    await fetchTasks();
+    await fetchActivities();
 })
 
-async function fetchTasks() {
-    try {
-        const response = await fetch('http://localhost:3001/api/tasks');
-        todos.value = await response.json();
-    } catch (error) {
-        console.error(error);
-    }
+// GET activities
+async function fetchActivities() {
+    const res = await fetch('http://ocalhost:8000/api/activities')
+    activities.value = await res.json()
 }
 </script>
 
 <template>
-    <div id="containerr" style="text-align: center; display: inline-block; width: 49%;">
-        <form @submit.prevent="addTodo">
-            <input autofocus placeholder="add your texthere" id='inptBtn' v-model="newTodo">
-            <button id="addBtn">Add Todo</button>
+    <div id="finance-tracker">
+        <form @submit.prevent="addActivity">
+            <input v-model="newName" placeholder="Activity name" required />
+            <input v-model.number="newAmount" type="number" placeholder="Amount" required />
+            <button type="submit">Add</button>
         </form>
-        <ul>
-            <li v-for="item in todos" :key="item.id">
-                {{ item.text }}
-                <button style='height: 39px; width: 39px; border-radius: 23px;' @click="removeTodo(item)">X</button>
-            </li>
-        </ul>
-        <router-link to="/">
-            <button style="width: 157px;">Back to Home</button>
-        </router-link>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="act in activities" :key="act.id">
+                    <td>{{ act.name }}</td>
+                    <td>{{ act.amount.toFixed(2) }}</td>
+                    <td>
+                        <button @click="removeActivity(act.id)">❌</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </template>
 
