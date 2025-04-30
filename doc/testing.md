@@ -1,3 +1,6 @@
 # Testing
 
-* Right now we don't have any functions to test, but when we eventually create them, we decided we will use python unittest. This can help us find errors in the functions easier and faster because we can test exact outputs of the desired functions. 
+* We will test how the database methods are performing by following this tutorial: https://coderpad.io/blog/development/a-guide-to-database-unit-testing-with-pytest-and-sqlalchemy/ 
+
+* And set up tests on frontend stuff following this documentation: https://vuejs.org/guide/scaling-up/testing#testing-composables 
+
