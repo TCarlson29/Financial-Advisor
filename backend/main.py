@@ -1,9 +1,10 @@
 # main.py
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 import crud, models, schemas
 from database import SessionLocal, engine
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -33,3 +34,8 @@ def create_activity(act: schemas.ActivityCreate, db: Session = Depends(get_db)):
 def delete_activity(act_id: int, db: Session = Depends(get_db)):
     if not crud.delete_activity(db, act_id):
         raise HTTPException(status_code=404, detail="Activity not found")
+    
+
+
+
+
