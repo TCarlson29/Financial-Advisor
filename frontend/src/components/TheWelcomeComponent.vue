@@ -2,7 +2,7 @@
     <div id='theContainer'>
       <h1> Welcome</h1>
       <h2>  Financial Advisor  </h2>
-      <router-link to="/todo-app">
+      <router-link to="/expense-tracker">
         <button style="margin: 23px; width: 24%;">Open</button>
       </router-link>
     </div>

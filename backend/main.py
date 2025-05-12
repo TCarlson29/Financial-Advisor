@@ -22,18 +22,18 @@ def get_db():
     try: yield db
     finally: db.close()
 
-@app.get("/api/activities", response_model=list[schemas.ActivityRead])
-def read_activities(db: Session = Depends(get_db)):
-    return crud.get_activities(db)
+@app.get("/api/expenses", response_model=list[schemas.ExpenseRead])
+def read_expenses(db: Session = Depends(get_db)):
+    return crud.get_expenses(db)
 
-@app.post("/api/activities", response_model=schemas.ActivityRead)
-def create_activity(act: schemas.ActivityCreate, db: Session = Depends(get_db)):
-    return crud.create_activity(db, act)
+@app.post("/api/expenses", response_model=schemas.ExpenseRead)
+def create_expense(act: schemas.ExpenseCreate, db: Session = Depends(get_db)):
+    return crud.create_expense(db, act)
 
-@app.delete("/api/activities/{act_id}", status_code=204)
-def delete_activity(act_id: int, db: Session = Depends(get_db)):
-    if not crud.delete_activity(db, act_id):
-        raise HTTPException(status_code=404, detail="Activity not found")
+@app.delete("/api/expenses/{exp_id}", status_code=204)
+def delete_expense(exp_id: int, db: Session = Depends(get_db)):
+    if not crud.delete_expense(db, exp_id):
+        raise HTTPException(status_code=404, detail="Expense not found")
     
 
 

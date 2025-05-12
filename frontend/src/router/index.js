@@ -1,11 +1,11 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
 import TheWelcomeView from '@/views/TheWelcomeView.vue'
-import TodoView from '@/views/TodoView.vue'
+import FinanceTrackerView from '@/views/FinanceTrackerView.vue'
 
 const routes = [
   { path: '/', component: TheWelcomeView },
-  { path: '/todo-app', component: TodoView }
+  { path: '/expense-tracker', component: FinanceTrackerView }
 ]
 
 const router = createRouter({
@@ -14,4 +14,3 @@ const router = createRouter({
 })
 
 export default router
-// Önce TodoComponent TODO
