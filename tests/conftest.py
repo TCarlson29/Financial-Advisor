@@ -1,9 +1,19 @@
-# tests/conftest.py
+import sys, os
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+sys.path.insert(0, PROJECT_ROOT)
+
+from backend.main import app
+
+@pytest.fixture
+def client():
+    return TestClient(app)
 from backend.database import Base  # import your Base
+import backend.models
 
 # 1) Create an in-memory SQLite engine:
 _TEST_DATABASE_URL = "sqlite:///:memory:"
@@ -18,7 +28,6 @@ SessionLocalTest = sessionmaker(
     autocommit=False,
 )
 
-# 3) Create tables in the in-memory DB once, before tests run:
 Base.metadata.create_all(bind=engine)
 
 @pytest.fixture

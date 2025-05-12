@@ -2,8 +2,8 @@
 from fastapi import FastAPI, Depends, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-import crud, models, schemas
-from database import SessionLocal, engine
+from backend import crud, models, schemas, database
+from backend.database import SessionLocal, engine
 
 
 models.Base.metadata.create_all(bind=engine)

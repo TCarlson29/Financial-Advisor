@@ -6,7 +6,7 @@ const newName = ref('')
 const newCost = ref(0)
 const expenses = ref([])
 
-// POST activity
+// POST expense
 async function createExpense(name, cost) {
     const opts = {
         method: 'POST',
@@ -16,7 +16,7 @@ async function createExpense(name, cost) {
     return fetch('http://localhost:8000/api/expenses', opts).then(r => r.json())
 }
 
-// DELETE activity
+// DELETE expense
 async function deleteExpense(id) {
     await fetch(`http://localhost:8000/api/expenses/${id}`, { method: 'DELETE' })
     expenses.value = expenses.value.filter(a => a.id !== id)
