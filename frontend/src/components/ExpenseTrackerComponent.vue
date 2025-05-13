@@ -3,52 +3,52 @@ import { onMounted, ref } from 'vue'
 
 let id = 0
 const newName = ref('')
-const newAmount = ref(0)
-const activities = ref([])
+const newCost = ref(0)
+const expenses = ref([])
 
-// POST activity
-async function createActivity(name, amount) {
+// POST expense
+async function createExpense(name, cost) {
     const opts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, amount })
+        body: JSON.stringify({ name, cost: cost })
     }
-    return fetch('http://localhost:8000/api/activities', opts).then(r => r.json())
+    return fetch('http://localhost:8000/api/expenses', opts).then(r => r.json())
 }
 
-// DELETE activity
-async function deleteActivity(id) {
-    await fetch(`http://localhost:8000/api/activities/${id}`, { method: 'DELETE' })
-    activities.value = activities.value.filter(a => a.id !== id)
+// DELETE expense
+async function deleteExpense(id) {
+    await fetch(`http://localhost:8000/api/expenses/${id}`, { method: 'DELETE' })
+    expenses.value = expenses.value.filter(a => a.id !== id)
 }
 
-async function addActivity() {
-  const newAct = await createActivity(newName.value, newAmount.value)
-  activities.value.push(newAct)
+async function addExpense() {
+  const newAct = await createExpense(newName.value, newCost.value)
+  expenses.value.push(newAct)
   newName.value = ''
-  newAmount.value = 0
+  newCost.value = 0
 }
 
-async function removeActivity(id) {
-  await deleteActivity(id)
+async function removeExpense(id) {
+  await deleteExpense(id)
 }
 
 onMounted(async () => {
-    await fetchActivities();
+    await fetchExpenses();
 })
 
-// GET activities
-async function fetchActivities() {
-    const res = await fetch('http://localhost:8000/api/activities')
-    activities.value = await res.json()
+// GET expenses
+async function fetchExpenses() {
+    const res = await fetch('http://localhost:8000/api/expenses')
+    expenses.value = await res.json()
 }
 </script>
 
 <template>
     <div id="finance-tracker">
-        <form @submit.prevent="addActivity">
-            <input v-model="newName" placeholder="Activity name" required />
-            <input v-model.number="newAmount" type="number" placeholder="Amount" required />
+        <form @submit.prevent="addExpense">
+            <input v-model="newName" placeholder="Expense name" required />
+            <input v-model.number="newCost" type="number" placeholder="Cost" required />
             <button type="submit">Add</button>
         </form>
 
@@ -56,16 +56,16 @@ async function fetchActivities() {
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Amount</th>
+                    <th>Cost</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="act in activities" :key="act.id">
+                <tr v-for="act in expenses" :key="act.id">
                     <td>{{ act.name }}</td>
-                    <td>{{ act.amount.toFixed(2) }}</td>
+                    <td>{{ act.cost.toFixed(2) }}</td>
                     <td>
-                        <button @click="removeActivity(act.id)">❌</button>
+                        <button @click="removeExpense(act.id)">❌</button>
                     </td>
                 </tr>
             </tbody>

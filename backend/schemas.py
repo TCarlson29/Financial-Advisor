@@ -1,10 +1,10 @@
 # schemas.py
 from pydantic import BaseModel, ConfigDict
 
-class ActivityCreate(BaseModel):
+class ExpenseCreate(BaseModel):
     name: str
-    amount: float
+    cost: float
 
-class ActivityRead(ActivityCreate):
+class ExpenseRead(ExpenseCreate):
     id: int
     model_config = ConfigDict(from_attributes=True)

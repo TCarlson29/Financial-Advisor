@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-
+import pytest
 from fake_main import fake_app
 
 client = TestClient(fake_app)
@@ -63,3 +63,14 @@ def test_create_existing_item():
     )
     assert response.status_code == 409
     assert response.json() == {"detail": "Item already exists"}
+    
+@pytest.mark.parametrize("payload,field", [
+    ({"cost":10.0, "name":42}, "name"),
+    ({"name":"Taxi", "cost":"expensive"}, "cost"),
+    ({"name":None,  "cost":None}, "name"),
+])
+def test_create_expense_api_invalid_types(client, payload, field):
+    r = client.post("/api/expenses", json=payload)
+    assert r.status_code == 422, f"expected validation error on `{field}`, got {r.status_code}"
+    data = r.json()
+    assert data["detail"][0]["loc"][-1] == field
