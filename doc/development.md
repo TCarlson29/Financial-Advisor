@@ -35,9 +35,6 @@ git checkout -b feature/<your-feature-name>
 1. **Create a virtual environment** in the `backend/` folder:
    ```bash
    cd backend
-   # Windows (PowerShell):
-   py -3 -m venv .venv
-   # macOS/Linux:
    python3 -m venv .venv
    ```
 2. **Activate the venv**:
@@ -48,9 +45,10 @@ git checkout -b feature/<your-feature-name>
    ```bash
    pip install -r requirements.txt
    ```
-4. **Run the backend in reload mode**:
+4. **Run the backend in reload mode from the root directoy**:
    ```bash
-   uvicorn main:app --reload --port 8000
+   cd ..
+   uvicorn backend.main:app --reload --port 8000
    ```
 
 The FastAPI server will now reload on file changes at **http://localhost:8000**.
@@ -67,9 +65,10 @@ The FastAPI server will now reload on file changes at **http://localhost:8000**.
    ```bash
    npm install
    ```
-3. **Run the dev server**:
+3. **Run the dev server from the root directory**:
    ```bash
-   npm run dev
+   cd ..
+   npm run frontend:dev 
    ```
 
 Vite will start the hot‑reload server on **http://localhost:5173**.

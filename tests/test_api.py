@@ -29,7 +29,7 @@ def test_add_one_then_delete_it(client):
     assert r.status_code == 200 # OK
     
     d = client.delete("/api/expenses/1")
-    assert d.status_code == 204 # Deleted
+    assert d.status_code == 204 # No Content
     
     response = client.get("/api/expenses")
     assert response.json() == []
@@ -49,6 +49,13 @@ def test_add_duplicate(client):
     
     r2 = client.post("/api/expenses", json=expense)
     assert r2.status_code == 200 # OK
+    
+    d1 = client.delete("/api/expenses/1")
+    assert d1.status_code == 204
+    
+    d2 = client.delete("/api/expenses/2")
+    assert d2.status_code == 204
+    
     
 @pytest.mark.parametrize("payload,field", [
     ({"cost":10.0, "name":42}, "name"),
