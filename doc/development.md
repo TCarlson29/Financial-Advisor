@@ -47,7 +47,7 @@ git checkout -b feature/<your-feature-name>
    ```
 4. **Run the backend in reload mode from the root directoy**:
    ```bash
-   cd ..
+   cd .. # If currently in /backend
    uvicorn backend.main:app --reload --port 8000
    ```
 
@@ -67,7 +67,7 @@ The FastAPI server will now reload on file changes at **http://localhost:8000**.
    ```
 3. **Run the dev server from the root directory**:
    ```bash
-   cd ..
+   cd .. # If currently in /frontend
    npm run frontend:dev 
    ```
 
