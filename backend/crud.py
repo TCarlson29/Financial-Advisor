@@ -1,21 +1,21 @@
 # crud.py
 from sqlalchemy.orm import Session
-import models, schemas
+from backend import models, schemas
 
-def get_activities(db: Session):
-    return db.query(models.Activity).all()
+def get_expenses(db: Session):
+    return db.query(models.Expense).all()
 
-def create_activity(db: Session, act: schemas.ActivityCreate):
-    db_act = models.Activity(name=act.name, amount=act.amount)
-    db.add(db_act)
+def create_expense(db: Session, exp: schemas.ExpenseCreate):
+    db_exp = models.Expense(name=exp.name, cost=exp.cost)
+    db.add(db_exp)
     db.commit()
-    db.refresh(db_act)
-    return db_act
+    db.refresh(db_exp)
+    return db_exp
 
-def delete_activity(db: Session, act_id: int):
-    obj = db.query(models.Activity).get(act_id)
-    if obj:
-        db.delete(obj)
-        db.commit()
-        return True
-    return False
+def delete_expense(db: Session, exp_id: int) -> bool:
+    obj = db.get(models.Expense, exp_id)
+    if not obj:
+        return False
+    db.delete(obj)
+    db.commit()
+    return True
