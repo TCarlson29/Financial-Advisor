@@ -3,15 +3,16 @@ import { onMounted, ref } from 'vue'
 
 let id = 0
 const newName = ref('')
+const newCategory = ref('')
 const newCost = ref(0)
 const expenses = ref([])
 
 // POST expense
-async function createExpense(name, cost) {
+async function createExpense(name, category, cost) {
     const opts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, cost: cost })
+        body: JSON.stringify({ name, category, cost })
     }
     return fetch('http://localhost:8000/api/expenses', opts).then(r => r.json())
 }
@@ -23,14 +24,19 @@ async function deleteExpense(id) {
 }
 
 async function addExpense() {
-  const newAct = await createExpense(newName.value, newCost.value)
-  expenses.value.push(newAct)
-  newName.value = ''
-  newCost.value = 0
+    const newAct = await createExpense(
+        newName.value,
+        newCategory.value,
+        newCost.value
+    );
+    expenses.value.push(newAct)
+    newName.value = ''
+    newCategory.value = ''
+    newCost.value = 0
 }
 
 async function removeExpense(id) {
-  await deleteExpense(id)
+    await deleteExpense(id)
 }
 
 onMounted(async () => {
@@ -48,6 +54,7 @@ async function fetchExpenses() {
     <div id="finance-tracker">
         <form @submit.prevent="addExpense">
             <input v-model="newName" placeholder="Expense name" required />
+            <CategorySelect v-model="newCategory" />
             <input v-model.number="newCost" type="number" placeholder="Cost" required />
             <button type="submit">Add</button>
         </form>
@@ -56,6 +63,7 @@ async function fetchExpenses() {
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Category</th>
                     <th>Cost</th>
                     <th>Actions</th>
                 </tr>
@@ -63,6 +71,7 @@ async function fetchExpenses() {
             <tbody>
                 <tr v-for="act in expenses" :key="act.id">
                     <td>{{ act.name }}</td>
+                    <td>{{ act.category }}</td>
                     <td>{{ act.cost.toFixed(2) }}</td>
                     <td>
                         <button @click="removeExpense(act.id)">❌</button>

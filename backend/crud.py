@@ -6,7 +6,7 @@ def get_expenses(db: Session):
     return db.query(models.Expense).all()
 
 def create_expense(db: Session, exp: schemas.ExpenseCreate):
-    db_exp = models.Expense(name=exp.name, cost=exp.cost)
+    db_exp = models.Expense(name=exp.name, category =exp.category, cost=exp.cost)
     db.add(db_exp)
     db.commit()
     db.refresh(db_exp)
