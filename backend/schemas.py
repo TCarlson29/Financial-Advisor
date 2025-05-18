@@ -9,3 +9,14 @@ class ExpenseCreate(BaseModel):
 class ExpenseRead(ExpenseCreate):
     id: int
     model_config = ConfigDict(from_attributes=True)
+    
+class BudgetBase(BaseModel):
+    category: str
+    limit: float
+
+class BudgetCreate(BudgetBase): ...
+class BudgetRead(BudgetBase):
+    id: int
+    class Config:
+        orm_mode = True
+

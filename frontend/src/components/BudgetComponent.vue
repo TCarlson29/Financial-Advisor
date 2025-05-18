@@ -1,23 +1,39 @@
 <script setup>
-import { onMounted, ref, computed } from 'vue'
-import CategorySelect from './CategorySelect.vue'
-import { useRoute } from 'vue-router'
+import { onMounted, ref, reactive, computed } from 'vue'
 
 const expenses = ref([])
+const budgets = reactive({})
 
 // load all expenses on mount
 onMounted(async () => {
-    const res = await fetch('http://localhost:8000/api/expenses')
-    expenses.value = await res.json()
+    const BASE = import.meta.env.VITE_API_BASE_URL
+    const [expRes, budRes] = await Promise.all([
+        fetch(`${BASE}/api/expenses`),
+        fetch(`${BASE}/api/budgets`),
+    ])
+    expenses.value = await expRes.json()
+    const budget_cat_limit = await budRes.json()
+    budget_cat_limit.forEach(b => { budgets[b.category] = b.limit })
 })
 
-// compute a map of { category → totalCost }
+// compute total spent per category
 const totalsByCategory = computed(() => {
     return expenses.value.reduce((acc, { category, cost }) => {
         acc[category] = (acc[category] || 0) + cost
         return acc
     }, /** start with an empty object **/ {})
 })
+
+// save whenever a budget input changes
+async function saveBudget(cat) {
+    const payload = { category: cat, limit: budgets[cat] }
+    await fetch('/api/budgets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    })
+}
+
 </script>
 
 <template>
@@ -28,13 +44,20 @@ const totalsByCategory = computed(() => {
                 <tr>
                     <th>Category</th>
                     <th>Total Spent</th>
+                    <th>Planned Budget</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- 3) loop over your computed totals -->
+                <!-- loop over computed totals -->
                 <tr v-for="(total, category) in totalsByCategory" :key="category">
                     <td>{{ category }}</td>
                     <td>{{ total.toFixed(2) }}</td>
+                    <td>
+                        <input type="number" min="0" v-model.number="budgets[category]" @change="saveBudget(category)"
+                            placeholder="0.00" />
+                    </td>
+                    <td>{{ total <= (budgets[category] || 0) ? 'Within' : 'Exceeded' }}</td>
                 </tr>
             </tbody>
         </table>

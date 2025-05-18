@@ -19,3 +19,18 @@ def delete_expense(db: Session, exp_id: int) -> bool:
     db.delete(obj)
     db.commit()
     return True
+
+def get_budgets(db: Session) -> list[models.Budget]:
+    return db.query(models.Budget).all()
+
+def upsert_budget(db: Session, b: schemas.BudgetCreate) -> models.Budget:
+    obj = db.query(models.Budget).filter_by(category=b.category).first()
+    if obj:
+        obj.limit = b.limit
+    else:
+        obj = models.Budget(**b.model_dump())
+        db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
+
