@@ -1,12 +1,13 @@
 <script setup>
 import { onMounted, ref, reactive, computed } from 'vue'
+import { CATEGORIES } from '@/config/categories.js'
 
+const BASE = import.meta.env.VITE_API_BASE_URL
 const expenses = ref([])
 const budgets = reactive({})
 
 // load all expenses on mount
 onMounted(async () => {
-    const BASE = import.meta.env.VITE_API_BASE_URL
     const [expRes, budRes] = await Promise.all([
         fetch(`${BASE}/api/expenses`),
         fetch(`${BASE}/api/budgets`),
@@ -27,18 +28,25 @@ const totalsByCategory = computed(() => {
 // save whenever a budget input changes
 async function saveBudget(cat) {
     const payload = { category: cat, limit: budgets[cat] }
-    await fetch('/api/budgets', {
+    const res = await fetch(`${BASE}/api/budgets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
     })
+    if (!res.ok) {
+        console.error('Budget save failed:', await res.text())
+    } else {
+        const saved = await res.json()
+        budgets[saved.category] = saved.limit
+    }
 }
+
 
 </script>
 
 <template>
     <div id="budget-component">
-        <h2>Budget Totals by Category</h2>
+        <h2>Budget Planning by Category</h2>
         <table>
             <thead>
                 <tr>
@@ -50,14 +58,19 @@ async function saveBudget(cat) {
             </thead>
             <tbody>
                 <!-- loop over computed totals -->
-                <tr v-for="(total, category) in totalsByCategory" :key="category">
-                    <td>{{ category }}</td>
-                    <td>{{ total.toFixed(2) }}</td>
+                <tr v-for="cat in CATEGORIES" :key="cat">
+                    <td>{{ cat }}</td>
+                    <!-- use 0 if there’s no entry yet -->
+                    <td>{{ (totalsByCategory[cat] || 0).toFixed(2) }}</td>
                     <td>
-                        <input type="number" min="0" v-model.number="budgets[category]" @change="saveBudget(category)"
+                        <input type="number" min="0" v-model.number="budgets[cat]" @change="saveBudget(cat)"
                             placeholder="0.00" />
                     </td>
-                    <td>{{ total <= (budgets[category] || 0) ? 'Within' : 'Exceeded' }}</td>
+                    <td :class="{
+                        'exceeded': (totalsByCategory[cat] || 0) > (budgets[cat] || 0)
+                    }">
+                        <!-- within or exceeded -->
+                        {{ (totalsByCategory[cat] || 0) <= (budgets[cat] || 0) ? 'Within' : 'Exceeded' }} </td>
                 </tr>
             </tbody>
         </table>
@@ -79,5 +92,9 @@ th,
 td {
     padding: 0.5rem;
     border: 1px solid #ccc;
+}
+.exceeded {
+  color: red;
+  font-weight: bold;
 }
 </style>

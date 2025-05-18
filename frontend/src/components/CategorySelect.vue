@@ -1,45 +1,25 @@
-<template>
-  <select v-model="selected">
-    <option disabled value="">— select category —</option>
-    <option
-      v-for="cat in categories"
-      :key="cat.value"
-      :value="cat.value"
-    >
-      {{ cat.label }}
-    </option>
-  </select>
-</template>
-
+<!-- src/components/CategorySelect.vue -->
 <script setup>
-import { ref, watch } from 'vue'
+import { defineProps, defineEmits } from 'vue'
+import { CATEGORIES } from '@/config/categories.js'
 
 const props = defineProps({
-  modelValue: { type: String, default: '' },
-  categories: {
-    type: Array,
-    default: () => [
-      { value: 'food', label: 'Food' },
-      { value: 'transport', label: 'Transport' },
-      { value: 'entertainment', label: 'Entertainment' },
-      // …any defaults you like
-    ]
-  }
+  modelValue: String
 })
 
 const emit = defineEmits(['update:modelValue'])
 
-// keep an internal ref in sync with the outside v-model
-const selected = ref(props.modelValue)
-
-watch(() => props.modelValue, v => {
-  selected.value = v
-})
-
-watch(selected, v => {
-  emit('update:modelValue', v)
-})
+function onChange(e) {
+  emit('update:modelValue', e.target.value)
+}
 </script>
+
+<template>
+  <select :value="modelValue" @change="onChange">
+    <option disabled value="">Select a category</option>
+    <option v-for="c in CATEGORIES" :key="c" :value="c">{{ c }}</option>
+  </select>
+</template>
 
 <style scoped>
 select {

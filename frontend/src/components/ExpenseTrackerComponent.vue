@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref , computed } from 'vue'
+const BASE = import.meta.env.VITE_API_BASE_URL
 
 let id = 0
 const newName = ref('')
@@ -18,12 +19,12 @@ async function createExpense(name, category, cost) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, category, cost })
     }
-    return fetch('http://localhost:8000/api/expenses', opts).then(r => r.json())
+    return fetch(`${BASE}/api/expenses`, opts).then(r => r.json())
 }
 
 // DELETE expense
 async function deleteExpense(id) {
-    await fetch(`http://localhost:8000/api/expenses/${id}`, { method: 'DELETE' })
+    await fetch(`${BASE}/api/expenses/${id}`, { method: 'DELETE' })
     expenses.value = expenses.value.filter(a => a.id !== id)
 }
 
@@ -49,7 +50,7 @@ onMounted(async () => {
 
 // GET expenses
 async function fetchExpenses() {
-    const res = await fetch('http://localhost:8000/api/expenses')
+    const res = await fetch(`${BASE}/api/expenses`)
     expenses.value = await res.json()
 }
 </script>
@@ -58,7 +59,7 @@ async function fetchExpenses() {
     <div id="expense-tracker">
         <form @submit.prevent="addExpense">
             <input v-model="newName" placeholder="Expense name" required />
-            <CategorySelect v-model="newCategory" />
+            <CategorySelect v-model="newCategory" required />
             <input v-model.number="newCost" type="number" placeholder="Cost" required />
             <button type="submit" id="add-expense-button">Add</button>
         </form>
