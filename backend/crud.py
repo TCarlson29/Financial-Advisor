@@ -6,7 +6,7 @@ def get_expenses(db: Session):
     return db.query(models.Expense).all()
 
 def create_expense(db: Session, exp: schemas.ExpenseCreate):
-    db_exp = models.Expense(name=exp.name, cost=exp.cost)
+    db_exp = models.Expense(name=exp.name, category =exp.category, cost=exp.cost)
     db.add(db_exp)
     db.commit()
     db.refresh(db_exp)
@@ -19,3 +19,18 @@ def delete_expense(db: Session, exp_id: int) -> bool:
     db.delete(obj)
     db.commit()
     return True
+
+def get_budgets(db: Session) -> list[models.Budget]:
+    return db.query(models.Budget).all()
+
+def upsert_budget(db: Session, b: schemas.BudgetCreate) -> models.Budget:
+    obj = db.query(models.Budget).filter_by(category=b.category).first()
+    if obj:
+        obj.limit = b.limit
+    else:
+        obj = models.Budget(**b.model_dump())
+        db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
+

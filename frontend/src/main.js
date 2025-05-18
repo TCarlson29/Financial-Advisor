@@ -2,5 +2,9 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import CategorySelect from '@/components/CategorySelect.vue'
 
-createApp(App).use(router).mount('#app')
+const app = createApp(App)
+app.use(router)
+app.component('CategorySelect', CategorySelect)
+app.mount('#app')
