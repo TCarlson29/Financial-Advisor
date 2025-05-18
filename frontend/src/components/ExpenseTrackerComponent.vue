@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref , computed } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 const BASE = import.meta.env.VITE_API_BASE_URL
 
 let id = 0
@@ -7,10 +7,13 @@ const newName = ref('')
 const newCategory = ref('')
 const newCost = ref(0)
 const expenses = ref([])
-const totalCost = computed(() => 
-  expenses.value.reduce((sum, e) => sum + (e.cost ?? 0), 0)
+const totalCost = computed(() =>
+    expenses.value.reduce((sum, e) => sum + (e.cost ?? 0), 0)
 )
 
+const maxRows = ref(7);
+// expense list row height for styling
+const rowHeightPx = 40;
 
 // POST expense
 async function createExpense(name, category, cost) {
@@ -57,6 +60,7 @@ async function fetchExpenses() {
 
 <template>
     <div id="expense-tracker">
+        <h1>Expenses Tracker</h1>
         <form @submit.prevent="addExpense">
             <input v-model="newName" placeholder="Expense name" required />
             <CategorySelect v-model="newCategory" required />
@@ -67,42 +71,47 @@ async function fetchExpenses() {
         <h2>
             Total: {{ totalCost.toFixed(2) }}
         </h2>
+        <div class="expense-list">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Cost</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="act in expenses" :key="act.id">
+                        <td>{{ act.name }}</td>
+                        <td>{{ act.category }}</td>
+                        <td>{{ act.cost.toFixed(2) }}</td>
+                        <td>
+                            <button @click="removeExpense(act.id)">X</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Cost</th>
-                    <th>Remove</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="act in expenses" :key="act.id">
-                    <td>{{ act.name }}</td>
-                    <td>{{ act.category }}</td>
-                    <td>{{ act.cost.toFixed(2) }}</td>
-                    <td>
-                        <button @click="removeExpense(act.id)">X</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 </template>
 
 
 <style scoped>
-/* Sayfayı ortala */
-body {
+#expense-tracker {
+    /* stack form/total/table vertically */
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
+    flex-direction: column;
+    /* make the whole component fill the screen if you like */
+    /* height: 100vh; */
+    /* center it on the page or give it a max-width */
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1rem;
 }
 
-/* Formu ortala ve oval çerçeve ekle */
+
 form {
     display: flex;
     padding-left: 12px;
@@ -127,63 +136,35 @@ input {
 }
 
 
+/* this is your scrollable container */
+.expense-list {
+    max-height: 350px;
+    flex: 1 1 auto;
+    /* take up all remaining space */
+    overflow-y: auto;
+    /* scroll only when needed */
+    /* optional visual styling */
+    border-top: 1px solid #ddd;
+    margin-top: 1rem;
+}
 
-button {
+/* make the table fill its wrapper */
+.expense-list table {
     width: 100%;
-    padding: 10px;
-    background-color: transparent;
-    color: white;
-    border: none;
-    padding: 12px;
-    /* border-radius: 12px; */
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #aaaaaa23;
-}
-
-#inptBtn {
-    border-radius: 23px;
-    height: 59px;
-    margin-bottom: 5%;
-    width: 89%;
-    background: transparent;
-    color: white;
-}
-
-
-#add-expense-button {
-    width: 50%;
-    /* border: 1px solid white !important; */
-}
-
-
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    padding: 10px;
-    border: 1px solid #ffffff4a;
-    border-radius: 23px;
-    background-color: #fff;
-    color: rgb(255, 255, 255);
-    background-color: transparent;
-}
-
-table, th, td {
-  border: 1px solid;
-}
-
-table {
     border-collapse: collapse;
-    width: 100%;
+}
+
+.expense-list thead th {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+  border-bottom: 2px solid #ccc;
+}
+
+th,
+td {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
 }
 </style>
