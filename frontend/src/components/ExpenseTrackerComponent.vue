@@ -1,36 +1,47 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref , computed } from 'vue'
+const BASE = import.meta.env.VITE_API_BASE_URL
 
 let id = 0
 const newName = ref('')
+const newCategory = ref('')
 const newCost = ref(0)
 const expenses = ref([])
+const totalCost = computed(() => 
+  expenses.value.reduce((sum, e) => sum + (e.cost ?? 0), 0)
+)
+
 
 // POST expense
-async function createExpense(name, cost) {
+async function createExpense(name, category, cost) {
     const opts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, cost: cost })
+        body: JSON.stringify({ name, category, cost })
     }
-    return fetch('http://localhost:8000/api/expenses', opts).then(r => r.json())
+    return fetch(`${BASE}/api/expenses`, opts).then(r => r.json())
 }
 
 // DELETE expense
 async function deleteExpense(id) {
-    await fetch(`http://localhost:8000/api/expenses/${id}`, { method: 'DELETE' })
+    await fetch(`${BASE}/api/expenses/${id}`, { method: 'DELETE' })
     expenses.value = expenses.value.filter(a => a.id !== id)
 }
 
 async function addExpense() {
-  const newAct = await createExpense(newName.value, newCost.value)
-  expenses.value.push(newAct)
-  newName.value = ''
-  newCost.value = 0
+    const newAct = await createExpense(
+        newName.value,
+        newCategory.value,
+        newCost.value
+    );
+    expenses.value.push(newAct)
+    newName.value = ''
+    newCategory.value = ''
+    newCost.value = 0
 }
 
 async function removeExpense(id) {
-  await deleteExpense(id)
+    await deleteExpense(id)
 }
 
 onMounted(async () => {
@@ -39,33 +50,40 @@ onMounted(async () => {
 
 // GET expenses
 async function fetchExpenses() {
-    const res = await fetch('http://localhost:8000/api/expenses')
+    const res = await fetch(`${BASE}/api/expenses`)
     expenses.value = await res.json()
 }
 </script>
 
 <template>
-    <div id="finance-tracker">
+    <div id="expense-tracker">
         <form @submit.prevent="addExpense">
             <input v-model="newName" placeholder="Expense name" required />
+            <CategorySelect v-model="newCategory" required />
             <input v-model.number="newCost" type="number" placeholder="Cost" required />
-            <button type="submit">Add</button>
+            <button type="submit" id="add-expense-button">Add</button>
         </form>
+
+        <h2>
+            Total: {{ totalCost.toFixed(2) }}
+        </h2>
 
         <table>
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Category</th>
                     <th>Cost</th>
-                    <th>Actions</th>
+                    <th>Remove</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="act in expenses" :key="act.id">
                     <td>{{ act.name }}</td>
+                    <td>{{ act.category }}</td>
                     <td>{{ act.cost.toFixed(2) }}</td>
                     <td>
-                        <button @click="removeExpense(act.id)">❌</button>
+                        <button @click="removeExpense(act.id)">X</button>
                     </td>
                 </tr>
             </tbody>
@@ -90,7 +108,7 @@ form {
     padding-left: 12px;
     padding-right: 12px;
     margin-bottom: 23px;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     border: 2px solid #ccc;
     border-radius: 34px;
@@ -102,6 +120,7 @@ form {
 input {
     margin-bottom: 10px;
     padding: 10px;
+    margin: 10px;
     border-radius: 5px;
     color: black;
     /* Metin rengini siyah olarak ayarla */
@@ -109,6 +128,20 @@ input {
 
 
 
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: transparent;
+    color: white;
+    border: none;
+    padding: 12px;
+    /* border-radius: 12px; */
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #aaaaaa23;
+}
 
 #inptBtn {
     border-radius: 23px;
@@ -120,25 +153,12 @@ input {
 }
 
 
-#addBtn {
+#add-expense-button {
     width: 50%;
-    border: 1px solid white !important;
+    /* border: 1px solid white !important; */
 }
 
 
-button {
-    padding: 10px;
-    background-color: transparent;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 12px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #aaaaaa23;
-}
 
 ul {
     list-style-type: none;
@@ -155,7 +175,15 @@ li {
     border-radius: 23px;
     background-color: #fff;
     color: rgb(255, 255, 255);
-    /* Metin rengini siyah olarak ayarla */
     background-color: transparent;
+}
+
+table, th, td {
+  border: 1px solid;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
 }
 </style>

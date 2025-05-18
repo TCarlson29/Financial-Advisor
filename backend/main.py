@@ -34,6 +34,15 @@ def create_expense(act: schemas.ExpenseCreate, db: Session = Depends(get_db)):
 def delete_expense(exp_id: int, db: Session = Depends(get_db)):
     if not crud.delete_expense(db, exp_id):
         raise HTTPException(status_code=404, detail="Expense not found")
+
+@app.get("/api/budgets", response_model=list[schemas.BudgetRead])
+def read_budgets(db: Session = Depends(get_db)):
+    return crud.get_budgets(db)
+
+@app.post("/api/budgets", response_model=schemas.BudgetRead)
+def create_or_update_budget(bud: schemas.BudgetCreate, db: Session = Depends(get_db)):
+    return crud.upsert_budget(db, bud)
+
     
 
 

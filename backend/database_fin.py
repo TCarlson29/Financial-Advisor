@@ -31,6 +31,6 @@ all_users = session.query(User).all()
 print("All users: ", all_users)
 
 user = session.query(User).filter_by(username='Tanner').first()
-print("User: ", user.username, user.email)
+# print("User: ", user.username, user.email)
 
 session.close()
