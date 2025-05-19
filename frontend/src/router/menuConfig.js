@@ -1,4 +1,5 @@
 // src/router/menuConfig.js
+// Make sure to name the views as <label>View.vue for index.js to automatically populate the NavBar route correctly
 export const menuConfig = [
   {
     path: '/',
@@ -21,4 +22,11 @@ export const menuConfig = [
     order: 3,
     group: 'Tracker'
   },
+  {
+    path: '/savings',
+    label: 'Savings',
+    icon: 'money-bill',
+    order: 4,
+    group: 'Tracker'
+  }
 ]

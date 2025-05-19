@@ -17,14 +17,28 @@ class BudgetBase(BaseModel):
 class BudgetCreate(BudgetBase): ...
 class BudgetRead(BudgetBase):
     id: int
-    class Config:
-        orm_mode = True
-
+    model_config = ConfigDict(from_attributes=True)
+        
 class CategoryBase(BaseModel):
     name: str
 
 class CategoryCreate(CategoryBase): ...
 class CategoryRead(CategoryBase):
     id: int
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
+
+class SavingsBase(BaseModel):
+    name: str
+    amount: float
+    time_saved: float
+    time_saved_unit: str
+    rate: float
+    rate_time_unit: str
+    rate_type: str
+    final: float 
+    gain: float 
+    
+class SavingsCreate(SavingsBase): ...
+class SavingsRead(SavingsBase):
+    id: int
+    model_config = ConfigDict(from_attributes=True)
