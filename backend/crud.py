@@ -56,15 +56,7 @@ def get_savings(db: Session) -> list[models.Savings]:
     return db.query(models.Savings).all()
 
 def create_savings(db: Session, s: schemas.SavingsCreate) -> models.Savings:
-    db_savings = models.Savings(
-        name=s.name,
-        amount=s.amount,
-        time_saved=s.time_saved,
-        time_saved_unit=s.time_saved_unit,
-        rate=s.rate,
-        rate_type=s.rate_type,
-        rate_time_unit=s.rate_time_unit
-    )
+    db_savings = models.Savings(**s.model_dump())
     db.add(db_savings)
     db.commit()
     db.refresh(db_savings)
