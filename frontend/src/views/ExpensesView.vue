@@ -1,5 +1,5 @@
 <script setup>
-import ExpenseTrackerComponent from '../components/ExpenseTrackerComponent.vue'
+import ExpenseTrackerComponent from '../components/ExpensesComponent.vue'
 </script>
 
 <template>

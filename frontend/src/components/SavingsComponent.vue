@@ -4,74 +4,91 @@ const BASE = import.meta.env.VITE_API_BASE_URL
 
 let id = 0
 const newName = ref('')
-const newCategory = ref('')
-const newCost = ref(0)
-const expenses = ref([])
+const newAmount = ref(0)
+const newTimeSaved = ref(0)
+const newTimeSavedUnit = ref('')
+const newRate = ref(0)
+const newRateType = ref('')
+const newRateTimeUnit = ref('')
+const savings = ref([])
+
 const totalCost = computed(() =>
-    expenses.value.reduce((sum, e) => sum + (e.cost ?? 0), 0)
+    savings.value.reduce((sum, e) => sum + (e.cost ?? 0), 0)
 )
 
-const maxRows = ref(7);
-// expense list row height for styling
-const rowHeightPx = 40;
-
-// POST expense
-async function createExpense(name, category, cost) {
+// POST saving
+async function createSaving(name, category, cost) {
     const opts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, category, cost })
     }
-    return fetch(`${BASE}/api/expenses`, opts).then(r => r.json())
+    return fetch(`${BASE}/api/savings`, opts).then(r => r.json())
 }
 
-// DELETE expense
-async function deleteExpense(id) {
-    await fetch(`${BASE}/api/expenses/${id}`, { method: 'DELETE' })
-    expenses.value = expenses.value.filter(a => a.id !== id)
+// DELETE saving
+async function deleteSaving(id) {
+    await fetch(`${BASE}/api/savings/${id}`, { method: 'DELETE' })
+    savings.value = savings.value.filter(a => a.id !== id)
 }
 
-async function addExpense() {
-    const newAct = await createExpense(
+async function addSaving() {
+    const newSave = await createSaving(
         newName.value,
-        newCategory.value,
-        newCost.value
+        newAmount.value,
+        newTimeSaved.value,
+        newTimeSavedUnit.value,
+        newRate.value,
+        newRateType.value,
+        newRateTimeUnit.value
     );
-    expenses.value.push(newAct)
+    savings.value.push(newSave)
     newName.value = ''
-    newCategory.value = ''
-    newCost.value = 0
+    newAmount.value = 0
+    newTimeSaved.value = 0
+    newTimeSavedUnit.value = ''
+    newRate.value = 0
+    newRateType.value = ''
+    newRateTimeUnit.value = ''
 }
 
-async function removeExpense(id) {
-    await deleteExpense(id)
+async function removeSaving(id) {
+    await deleteSaving(id)
 }
 
 onMounted(async () => {
-    await fetchExpenses();
+    await fetchSavings();
 })
 
-// GET expenses
-async function fetchExpenses() {
-    const res = await fetch(`${BASE}/api/expenses`)
-    expenses.value = await res.json()
+// GET savings
+async function fetchSavings() {
+    const res = await fetch(`${BASE}/api/savings`)
+    savings.value = await res.json()
 }
 </script>
 
 <template>
-    <div id="expense-tracker">
-        <h1>Expenses Tracker</h1>
-        <form @submit.prevent="addExpense">
-            <input v-model="newName" placeholder="Expense name" required />
-            <CategorySelect v-model="newCategory" required />
-            <input v-model.number="newCost" type="number" placeholder="Cost" required />
-            <button type="submit" id="add-expense-button">Add</button>
+    <div id="savings-tracker">
+        <h1>Savings Tracker</h1>
+        <form @submit.prevent="addSaving">
+            <div id = "savings-data">
+                <input v-model="newName" placeholder="Saving name" required />
+                <input v-model.number="newAmount" type="number" placeholder="Amount" required />
+                <input v-model.number="newTimeSaved" type="number" placeholder="Time Saved" required />
+                <input v-model="newTimeSavedUnit" placeholder="Time Saved Unit" required />
+                <input v-model.number="newRate" type="number" placeholder="Rate" required />
+                <input v-model="newRateType" placeholder="Rate Type" required />
+                <input v-model="newRateTimeUnit" placeholder="Rate Time Unit" required />
+            </div>
+            <div id="calculated-data">
+            </div>
+            <button type="submit" id="add-saving-button">Add</button>
         </form>
 
         <h2>
             Total: {{ totalCost.toFixed(2) }}
         </h2>
-        <div class="expense-list">
+        <div class="saving-list">
             <table>
                 <thead>
                     <tr>
@@ -82,12 +99,12 @@ async function fetchExpenses() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="act in expenses" :key="act.id">
-                        <td>{{ act.name }}</td>
-                        <td>{{ act.category }}</td>
-                        <td>{{ act.cost.toFixed(2) }}</td>
+                    <tr v-for="s in savings" :key="s.id">
+                        <td>{{ s.name }}</td>
+                        <td>{{ s.category }}</td>
+                        <td>{{ s.cost.toFixed(2) }}</td>
                         <td>
-                            <button @click="removeExpense(act.id)">X</button>
+                            <button @click="removeSaving(s.id)">X</button>
                         </td>
                     </tr>
                 </tbody>
@@ -99,7 +116,7 @@ async function fetchExpenses() {
 
 
 <style scoped>
-#expense-tracker {
+#saving-tracker {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -121,22 +138,25 @@ form {
     background: rgba(255, 255, 255, 0.1);
 }
 
-input, select, button {
-  /* give them all the same base sizing */
-  min-width: 120px;
-  padding: 0.5rem;
-  text-align: center;    /* center the placeholder / typed text */
-  border-radius: 5px;
-  border: 1px solid #999;
+input,
+select,
+button {
+    /* give them all the same base sizing */
+    min-width: 120px;
+    padding: 0.5rem;
+    text-align: center;
+    /* center the placeholder / typed text */
+    border-radius: 5px;
+    border: 1px solid #999;
 }
 
 
-#add-expense-button {
-  max-width: 80px;
+#add-saving-button {
+    max-width: 80px;
 }
 
 /* this is your scrollable container */
-.expense-list {
+.saving-list {
     max-height: 350px;
     flex: 1 1 auto;
     /* take up all remaining space */
@@ -148,12 +168,12 @@ input, select, button {
 }
 
 /* make the table fill its wrapper */
-.expense-list table {
+.saving-list table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.expense-list thead th {
+.saving-list thead th {
     position: sticky;
     top: 0;
     background: white;
