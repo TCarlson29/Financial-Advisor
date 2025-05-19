@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, reactive, computed } from 'vue'
-import { CATEGORIES } from '@/config/categories.js'
+import { categories } from '@/config/categories.js'
 
 const BASE = import.meta.env.VITE_API_BASE_URL
 const expenses = ref([])
@@ -58,7 +58,7 @@ async function saveBudget(cat) {
             </thead>
             <tbody>
                 <!-- loop over computed totals -->
-                <tr v-for="cat in CATEGORIES" :key="cat">
+                <tr v-for="cat in categories" :key="cat">
                     <td>{{ cat }}</td>
                     <!-- use 0 if there’s no entry yet -->
                     <td>{{ (totalsByCategory[cat] || 0).toFixed(2) }}</td>

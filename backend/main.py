@@ -9,9 +9,9 @@ from backend.database import SessionLocal, engine
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-app.add_middleware(  # same CORS as before
+app.add_middleware( 
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "http://localhost:8000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -43,8 +43,15 @@ def read_budgets(db: Session = Depends(get_db)):
 def create_or_update_budget(bud: schemas.BudgetCreate, db: Session = Depends(get_db)):
     return crud.upsert_budget(db, bud)
 
-    
+@app.get("/api/categories", response_model=list[schemas.CategoryRead])
+def read_categories(db: Session = Depends(get_db)):
+    return crud.get_categories(db)
 
+@app.post("/api/categories", response_model=schemas.CategoryRead)
+def create_category(cat: schemas.CategoryCreate, db: Session = Depends(get_db)):
+    return crud.create_category(db, cat)
 
-
-
+@app.delete("/api/categories/{cat_id}", status_code=204)
+def delete_category(cat_id: int, db: Session = Depends(get_db)):
+    if not crud.delete_category(db, cat_id):
+        raise HTTPException(status_code=404, detail="Category not found")
