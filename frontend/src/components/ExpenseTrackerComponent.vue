@@ -100,41 +100,40 @@ async function fetchExpenses() {
 
 <style scoped>
 #expense-tracker {
-    /* stack form/total/table vertically */
     display: flex;
     flex-direction: column;
-    /* make the whole component fill the screen if you like */
-    /* height: 100vh; */
-    /* center it on the page or give it a max-width */
-    max-width: 600px;
-    margin: 0 auto;
+    align-items: center;
+    margin: 10px auto;
     padding: 1rem;
 }
 
 
 form {
     display: flex;
-    padding-left: 12px;
-    padding-right: 12px;
-    margin-bottom: 23px;
-    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
+    gap: 1rem;
+    /* flex-direction: row; */
     border: 2px solid #ccc;
     border-radius: 34px;
-    padding-top: 34px;
-    padding-bottom: 34px;
-    background-color: transparent;
+    padding: 2rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
 }
 
-input {
-    margin-bottom: 10px;
-    padding: 10px;
-    margin: 10px;
-    border-radius: 5px;
-    color: black;
-    /* Metin rengini siyah olarak ayarla */
+input, select, button {
+  /* give them all the same base sizing */
+  min-width: 120px;
+  padding: 0.5rem;
+  text-align: center;    /* center the placeholder / typed text */
+  border-radius: 5px;
+  border: 1px solid #999;
 }
 
+
+#add-expense-button {
+  max-width: 80px;
+}
 
 /* this is your scrollable container */
 .expense-list {
@@ -155,11 +154,11 @@ input {
 }
 
 .expense-list thead th {
-  position: sticky;
-  top: 0;
-  background: white;
-  z-index: 10;
-  border-bottom: 2px solid #ccc;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+    border-bottom: 2px solid #ccc;
 }
 
 th,
