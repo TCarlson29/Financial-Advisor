@@ -50,7 +50,9 @@ def delete_category(db: Session, c_id: int) -> bool:
         return False
     db.delete(obj)
     db.commit()
-    return Truedef get_savings(db: Session) -> list[models.Savings]:
+    return True
+
+def get_savings(db: Session) -> list[models.Savings]:
     return db.query(models.Savings).all()
 
 def create_savings(db: Session, s: schemas.SavingsCreate) -> models.Savings:
