@@ -19,6 +19,12 @@ class Budget(Base):
     category: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     limit: Mapped[float] = mapped_column(Float, nullable=False)
 
+class Category(Base):
+    __tablename__ = "categories"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
 class Savings(Base):
     __tablename__ = "savings"
     

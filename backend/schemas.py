@@ -20,6 +20,15 @@ class BudgetRead(BudgetBase):
     class Config:
         orm_mode = True
         
+class CategoryBase(BaseModel):
+    name: str
+
+class CategoryCreate(CategoryBase): ...
+class CategoryRead(CategoryBase):
+    id: int
+    class Config:
+        orm_mode = True
+
 class SavingsBase(BaseModel):
     name: str
     amount: float
