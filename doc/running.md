@@ -11,6 +11,8 @@
 
 ## Quick Start with Docker
 
+Have Docker Desktop open.
+
 From the **project root** (where this README.md lives), run:
 
 ```bash
