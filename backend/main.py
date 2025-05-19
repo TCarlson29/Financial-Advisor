@@ -1,6 +1,7 @@
 # main.py
 from fastapi import FastAPI, Depends, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from backend import crud, models, schemas, database
 from backend.database import SessionLocal, engine
@@ -21,6 +22,19 @@ def get_db():
     db = SessionLocal()
     try: yield db
     finally: db.close()
+
+@app.on_event("startup")
+def seed_default_categories():
+    db = SessionLocal()
+    defaults = ["Food", "Transport", "Entertainment", "Utilities", "Miscellaneous"]
+    for name in defaults:
+        try:
+            # try insert; if unique constraint fails, ignore
+            db.add(models.Category(name=name))
+            db.commit()
+        except IntegrityError:
+            db.rollback()
+    db.close()
 
 @app.get("/api/expenses", response_model=list[schemas.ExpenseRead])
 def read_expenses(db: Session = Depends(get_db)):

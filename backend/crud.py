@@ -45,7 +45,7 @@ def create_category(db: Session, c: schemas.CategoryCreate):
     return db_c
 
 def delete_category(db: Session, c_id: int) -> bool:
-    obj = db.get(models.Expense, c_id)
+    obj = db.get(models.Category, c_id)
     if not obj:
         return False
     db.delete(obj)
