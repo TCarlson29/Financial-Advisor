@@ -34,3 +34,28 @@ def upsert_budget(db: Session, b: schemas.BudgetCreate) -> models.Budget:
     db.refresh(obj)
     return obj
 
+def get_savings(db: Session) -> list[models.Savings]:
+    return db.query(models.Savings).all()
+
+def create_savings(db: Session, s: schemas.SavingsCreate) -> models.Savings:
+    db_savings = models.Savings(
+        name=s.name,
+        amount=s.amount,
+        time_saved=s.time_saved,
+        time_saved_unit=s.time_saved_unit,
+        rate=s.rate,
+        rate_type=s.rate_type,
+        rate_time_unit=s.rate_time_unit
+    )
+    db.add(db_savings)
+    db.commit()
+    db.refresh(db_savings)
+    return db_savings
+
+def delete_savings(db: Session, s_id: int) -> bool:
+    obj = db.get(models.Savings, s_id)
+    if not obj:
+        return False
+    db.delete(obj)
+    db.commit()
+    return True

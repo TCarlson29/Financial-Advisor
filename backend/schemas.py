@@ -19,4 +19,18 @@ class BudgetRead(BudgetBase):
     id: int
     class Config:
         orm_mode = True
-
+        
+class SavingsBase(BaseModel):
+    name: str
+    amount: float
+    time_saved: float
+    time_saved_unit: str
+    rate: float
+    rate_type: str
+    rate_time_unit: str
+    
+class SavingsCreate(SavingsBase): ...
+class SavingsRead(SavingsBase):
+    id: int
+    class Config:
+        orm_mode = True
