@@ -4,7 +4,7 @@ const BASE = import.meta.env.VITE_API_BASE_URL
 
 let id = 0
 const newName = ref('')
-const newCategory = ref('')
+const chosenCategory = ref('')
 const newCost = ref(0)
 const expenses = ref([])
 const totalCost = computed(() =>
@@ -34,12 +34,12 @@ async function deleteExpense(id) {
 async function addExpense() {
     const newAct = await createExpense(
         newName.value,
-        newCategory.value,
+        chosenCategory.value,
         newCost.value
     );
     expenses.value.push(newAct)
     newName.value = ''
-    newCategory.value = ''
+    chosenCategory.value = ''
     newCost.value = 0
 }
 
@@ -63,7 +63,7 @@ async function fetchExpenses() {
         <h1>Expenses Tracker</h1>
         <form @submit.prevent="addExpense">
             <input v-model="newName" placeholder="Expense name" required />
-            <CategorySelect v-model="newCategory" required />
+            <CategorySelect v-model="chosenCategory" required />
             <input v-model.number="newCost" type="number" placeholder="Cost" required />
             <button type="submit" id="add-expense-button">Add</button>
         </form>

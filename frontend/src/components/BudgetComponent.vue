@@ -1,20 +1,23 @@
 <script setup>
 import { onMounted, ref, reactive, computed } from 'vue'
-import { CATEGORIES } from '@/config/categories.js'
 
 const BASE = import.meta.env.VITE_API_BASE_URL
 const expenses = ref([])
 const budgets = reactive({})
+const categories = ref([])
 
 // load all expenses on mount
 onMounted(async () => {
-    const [expRes, budRes] = await Promise.all([
+    const [expRes, budRes, catRes] = await Promise.all([
         fetch(`${BASE}/api/expenses`),
         fetch(`${BASE}/api/budgets`),
+        fetch(`${BASE}/api/categories`)
     ])
     expenses.value = await expRes.json()
     const budget_cat_limit = await budRes.json()
     budget_cat_limit.forEach(b => { budgets[b.category] = b.limit })
+    categories.value = await catRes.json()
+    categories.value = categories.value.map(c => c.name)
 })
 
 // compute total spent per category
@@ -58,7 +61,7 @@ async function saveBudget(cat) {
             </thead>
             <tbody>
                 <!-- loop over computed totals -->
-                <tr v-for="cat in CATEGORIES" :key="cat">
+                <tr v-for="cat in categories" :key="cat">
                     <td>{{ cat }}</td>
                     <!-- use 0 if there’s no entry yet -->
                     <td>{{ (totalsByCategory[cat] || 0).toFixed(2) }}</td>
