@@ -3,11 +3,11 @@ FROM python:3.11-slim AS backend-build
 WORKDIR /app
 
 # Copy and install requirements
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # copy the whole backend tree
-COPY . /app/backend
+COPY backend /app/backend
 
 # tell Python to look for “backend” under /app
 ENV PYTHONPATH=/app
