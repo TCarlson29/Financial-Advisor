@@ -6,7 +6,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./financial_advisor.db:/app/financial_advisor.db
+      - ./backend/financial_advisor.db:/app/financial_advisor.db
     restart: unless-stopped
 
   frontend:
