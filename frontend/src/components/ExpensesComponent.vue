@@ -119,6 +119,7 @@ form {
     border-radius: 34px;
     padding: 2rem 1rem;
     background: rgba(255, 255, 255, 0.1);
+    z-index: 20;
 }
 
 input, select, button {
@@ -143,6 +144,7 @@ input, select, button {
     overflow-y: auto;
     /* scroll only when needed */
     /* optional visual styling */
+    background-color: #507f57;
     border-top: 1px solid #ddd;
     margin-top: 1rem;
 }
@@ -150,13 +152,15 @@ input, select, button {
 /* make the table fill its wrapper */
 .expense-list table {
     width: 100%;
+    color: white;
     border-collapse: collapse;
 }
 
 .expense-list thead th {
     position: sticky;
     top: 0;
-    background: white;
+    /* background: white; */
+    background: rgb(60, 130, 94);
     z-index: 10;
     border-bottom: 2px solid #ccc;
 }

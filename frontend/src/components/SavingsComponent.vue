@@ -284,6 +284,8 @@ button {
     overflow-y: auto;
     /* scroll only when needed */
     /* optional visual styling */
+    background-color: #507f57;
+    color: white;
     border-top: 1px solid #ddd;
     margin-top: 1rem;
 }
@@ -297,7 +299,7 @@ button {
 .saving-list thead th {
     position: sticky;
     top: 0;
-    background: white;
+    background: rgb(60, 130, 94);
     z-index: 10;
     border-bottom: 2px solid #ccc;
 }

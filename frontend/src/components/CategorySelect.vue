@@ -11,7 +11,7 @@
             <li v-for="cat in categories" :key="cat.id" class="dropdown-item" @click="select(cat.name)">
                 <span class="name">{{ cat.name }}</span>
                 <!-- stopPropagation so clicking X doesn’t select -->
-                <button class="del-btn" @click.stop="removeCategory(cat.id)">×</button>
+                <button type="button"class="del-btn" @click.stop="removeCategory(cat.id)">×</button>
             </li>
             <li class="dropdown-item add-new" @click.stop="showDialog = true, open = false">
                 + Add new category…
@@ -23,8 +23,8 @@
                 <h3>Add a category</h3>
                 <input v-model="newCategory" placeholder="My new category" />
                 <div class="buttons">
-                    <button @click="confirmAdd" :disabled="!newCategory.trim()">Add</button>
-                    <button @click="cancelAdd">Cancel</button>
+                    <button type="button" @click="confirmAdd" :disabled="!newCategory.trim()">Add</button>
+                    <button type="button" @click="cancelAdd">Cancel</button>
                 </div>
             </div>
         </div>
@@ -158,10 +158,11 @@ function cancelAdd() {
     justify-content: center;
 }
 
+
 .modal {
     background: white;
     padding: 1rem;
-    border-radius: 6px;
+    border-radius: 1px;
     min-width: 200px;
 }
 
@@ -171,5 +172,9 @@ function cancelAdd() {
     justify-content: flex-end;
     color: black;
     gap: 0.5rem;
+}
+
+button {
+  background: black;
 }
 </style>

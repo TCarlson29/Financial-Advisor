@@ -88,6 +88,8 @@ async function saveBudget(cat) {
 
 table {
     width: 100%;
+    color: white;
+    background-color: #507f57;
     border-collapse: collapse;
 }
 
@@ -96,6 +98,11 @@ td {
     padding: 0.5rem;
     border: 1px solid #ccc;
 }
+
+th {
+    background: rgb(60, 130, 94);
+}
+
 .exceeded {
   color: red;
   font-weight: bold;
