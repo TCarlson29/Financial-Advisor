@@ -1,6 +1,8 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue'
 const BASE = import.meta.env.VITE_API_BASE_URL
+import CategorySelect from './CategorySelect.vue'
+import ChartDashboard from './ChartDashboard.vue'
 
 let id = 0
 const newName = ref('')
@@ -10,6 +12,16 @@ const expenses = ref([])
 const totalCost = computed(() =>
     expenses.value.reduce((sum, e) => sum + (e.cost ?? 0), 0)
 )
+
+// Chart Data
+const chartData = computed(() => {
+  const map = {}
+  for (const expense of expenses.value) {
+    const cat = expense.category
+    map[cat] = (map[cat] || 0) + expense.cost
+  }
+  return Object.entries(map).map(([label, value]) => ({ label, value }))
+})
 
 const maxRows = ref(7);
 // expense list row height for styling
@@ -93,7 +105,7 @@ async function fetchExpenses() {
                 </tbody>
             </table>
         </div>
-
+        <ChartDashboard :chartInput="chartData" />
     </div>
 </template>
 
