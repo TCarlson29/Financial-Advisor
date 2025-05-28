@@ -2,7 +2,7 @@
 import { onMounted, ref, computed } from 'vue'
 const BASE = import.meta.env.VITE_API_BASE_URL
 import CategorySelect from './CategorySelect.vue'
-import ChartDashboard from './ChartDashboard.vue'
+import Charts from './Charts.vue'
 
 let id = 0
 const newName = ref('')
@@ -105,7 +105,7 @@ async function fetchExpenses() {
                 </tbody>
             </table>
         </div>
-        <ChartDashboard :chartInput="chartData" />
+        <Charts :chartInput="chartData" />
     </div>
 </template>
 

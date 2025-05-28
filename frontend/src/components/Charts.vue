@@ -22,7 +22,7 @@ import {
 ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale)
 
 export default {
-  name: 'ChartDashboard',
+  name: 'Charts',
   props: {
     chartInput: {
       type: Array,
@@ -51,7 +51,10 @@ export default {
       }
     })
 
-    return { chartData, chartOptions }
+    return { 
+        chartData, 
+        chartOptions 
+    }
   }
 }
 </script>
