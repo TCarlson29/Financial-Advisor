@@ -107,4 +107,10 @@ th {
   color: red;
   font-weight: bold;
 }
+
+input[type=number] {
+  -moz-appearance: textfield;
+  text-align: right;
+  padding-right: 15px;
+}
 </style>

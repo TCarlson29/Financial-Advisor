@@ -153,49 +153,52 @@ async function fetchSavings() {
     <div id="savings-tracker">
         <h1>Savings Tracker</h1>
         <form @submit.prevent="addSaving">
-            <div id="savings-data">
-                <div id="savings-plan-name">
-                    Savings Plan:
-                    <input v-model="newName" placeholder="Enter label" required />
-                </div>
-                <div id="savings-amount">
-                    Amount of saved money:
-                    <input v-model.number="newAmount" type="number" placeholder="0.00" required />
-                </div>
-                <div id="time-saved">
-                    Saving Duration:
-                    <input v-model.number="newTimeSaved" type="number" placeholder="Time Saved" required />
+            <div id="savings-numbers">
+                <div id="savings-data">
+                    <div id="savings-plan-name">
+                        Savings Plan:
+                        <input v-model="newName" placeholder="Enter label" required />
+                    </div>
+                    <div id="savings-amount">
+                        Amount of saved money:
+                        <input v-model.number="newAmount" type="number" placeholder="0.00" required />
+                    </div>
+                    <div id="time-saved">
+                        Saving Duration:
+                        <input v-model.number="newTimeSaved" type="number" placeholder="Time Saved" required />
 
-                    <select v-model="newTimeSavedUnit" required>
-                        <option disabled value=""> Time Unit</option>
-                        <option v-for="u in timeUnits" :key="u" :value="u"> {{ u }}(s)</option>
-                    </select>
+                        <select v-model="newTimeSavedUnit" required>
+                            <option disabled value=""> Time Unit</option>
+                            <option v-for="u in timeUnits" :key="u" :value="u"> {{ u }}(s)</option>
+                        </select>
+                    </div>
+                    <div id="savings-rate">
+                        Rates of interest (%):
+                        <input v-model.number="newRate" type="number" placeholder="Rate" required />
+
+                        <select v-model="newRateTimeUnit" required>
+                            <option disabled value=""> Time Unit</option>
+                            <option v-for="u in timeUnits" :key="u" :value="u">per {{ u }}</option>
+                        </select>
+
+                        <select v-model="newRateType" required>
+                            <option disabled value="">Rates Type</option>
+                            <option v-for="t in rateTypes" :key="t" :value="t">{{ t }}</option>
+                        </select>
+                    </div>
                 </div>
-                <div id="savings-rate">
-                    Rates of interest (%):
-                    <input v-model.number="newRate" type="number" placeholder="Rate" required />
-
-                    <select v-model="newRateTimeUnit" required>
-                        <option disabled value=""> Time Unit</option>
-                        <option v-for="u in timeUnits" :key="u" :value="u">per {{ u }}</option>
-                    </select>
-
-                    <select v-model="newRateType" required>
-                        <option disabled value="">Rates Type</option>
-                        <option v-for="t in rateTypes" :key="t" :value="t">{{ t }}</option>
-                    </select>
+                <div id="calculated-data">
+                    <div id="savings-calculated-amount">
+                        Calculated Amount:
+                        <input type="number" :value="finalAmount.toFixed(2)" disabled />
+                    </div>
+                    <div id="savings-gain">
+                        Gain:
+                        <input type="number" :value="gain.toFixed(2)" disabled />
+                    </div>
                 </div>
             </div>
-            <div id="calculated-data">
-                <div id="savings-calculated-amount">
-                    Calculated Amount:
-                    <input type="number" :value="finalAmount.toFixed(2)" disabled />
-                </div>
-                <div id="savings-gain">
-                    Gain:
-                    <input type="number" :value="gain.toFixed(2)" disabled />
-                </div>
-            </div>
+
             <button type="submit" id="add-saving-button">Add Plan</button>
         </form>
 
@@ -204,27 +207,27 @@ async function fetchSavings() {
                 <thead>
                     <tr>
                         <th>Plan</th>
-                        <th>Saved</th>
+                        <th class="money-col">Saved</th>
                         <th>For</th>
                         <th>At</th>
-                        <th>Final</th>
-                        <th>Gain</th>
-                        <th>Remove</th>
+                        <th class="money-col">Final</th>
+                        <th class="money-col">Gain</th>
+                        <th class="del-col">Remove</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="s in savings" :key="s.id">
                         <td>{{ s.name }}</td>
-                        <td>{{ s.amount.toFixed(2) }}</td>
+                        <td class="money-col">{{ s.amount.toFixed(2) }}</td>
                         <td>{{ s.time_saved }} {{ s.time_saved_unit }} (s)</td>
                         <td>{{ s.rate }}% per {{ s.rate_time_unit }} ({{ s.rate_type }})</td>
-                        <td>{{ s.final.toFixed(2) }}</td>
-                        <td>
+                        <td class="money-col">{{ s.final.toFixed(2) }}</td>
+                        <td class="money-col">
                             <span :class="{ exceeded: s.gain < 0 }">
                                 {{ s.gain.toFixed(2) }}
                             </span>
                         </td>
-                        <td>
+                        <td class="del-col">
                             <button @click="removeSaving(s.id)">X</button>
                         </td>
                     </tr>
@@ -245,18 +248,48 @@ async function fetchSavings() {
     padding: 1rem;
 }
 
-
 form {
     display: flex;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto 1rem;
+    align-self: center;
+    flex-direction: column;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    /* flex-direction: row; */
     border: 2px solid #ccc;
     border-radius: 34px;
+    color: white;
     padding: 2rem 1rem;
     background: rgba(255, 255, 255, 0.1);
+}
+
+#savings-numbers {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+#savings-data,
+#calculated-data {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 1rem;
+}
+
+#savings-data {
+    flex: 2;
+    margin-right: 1rem;
+    align-items: flex-start;
+}
+
+#calculated-data {
+    flex: 1;
+    align-items: flex-end;
 }
 
 input,
@@ -265,7 +298,7 @@ button {
     /* give them all the same base sizing */
     min-width: 120px;
     padding: 0.5rem;
-    text-align: center;
+    /* text-align: center; */
     /* center the placeholder / typed text */
     border-radius: 5px;
     border: 1px solid #999;
@@ -274,12 +307,16 @@ button {
 
 #add-saving-button {
     max-width: 80px;
+    align-self: center;
 }
 
 /* this is your scrollable container */
 .saving-list {
+    width: 100%;
+    margin: 0 auto;
     max-height: 350px;
-    flex: 1 1 auto;
+    max-width: 80%;
+    align-self: center;
     /* take up all remaining space */
     overflow-y: auto;
     /* scroll only when needed */
@@ -294,6 +331,7 @@ button {
 .saving-list table {
     width: 100%;
     border-collapse: collapse;
+    text-align: left;
 }
 
 .saving-list thead th {
@@ -304,11 +342,26 @@ button {
     border-bottom: 2px solid #ccc;
 }
 
+.saving-list .money-col {
+    text-align: right;
+}
+
+.saving-list .del-col {
+    max-width: 500px;
+}
+
 th,
 td {
     border: 1px solid #ccc;
     padding: 0.5rem;
 }
 
-.exceeded { color: red; font-weight: bold; }
+.exceeded {
+    color: red;
+    font-weight: bold;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
 </style>
