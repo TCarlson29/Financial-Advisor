@@ -29,12 +29,12 @@
     * Chatbot companion to help navigate the app
     * Combo of Financial Advisor and Fantasy Football Assistant
 * Feedbacks
-    * Left justify input contents, right justify money
-    * Less garish colors
-    * Category dropdown can be tabbed to
-    * Cat add menu has black text
+    * (Done) Left justify input contents, right justify money
+    * (Done) Less garish colors
+    * (Done) Category dropdown can be tabbed to
+    * (Done) Cat add menu has black text
     * search function for expenses and plans
-    * More spacing for savings plan
+    * (Done) More spacing for savings plan
 
 ## Project Architecture
 * Dashboard with feature buttons

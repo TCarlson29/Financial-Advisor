@@ -5,15 +5,12 @@ const BASE = import.meta.env.VITE_API_BASE_URL
 let id = 0
 const newName = ref('')
 const chosenCategory = ref('')
-const newCost = ref(0)
+const newCost = ref('')
 const expenses = ref([])
 const totalCost = computed(() =>
     expenses.value.reduce((sum, e) => sum + (e.cost ?? 0), 0)
 )
 
-const maxRows = ref(7);
-// expense list row height for styling
-const rowHeightPx = 40;
 
 // POST expense
 async function createExpense(name, category, cost) {
@@ -32,15 +29,17 @@ async function deleteExpense(id) {
 }
 
 async function addExpense() {
-    const newAct = await createExpense(
-        newName.value,
-        chosenCategory.value,
-        newCost.value
-    );
+    // const newAct = await createExpense(
+    //     newName.value,
+    //     chosenCategory.value,
+    //     newCost.value
+    // );
+    const costNum = parseFloat(newCost.value)
+    const newAct  = await createExpense(newName.value, chosenCategory.value, costNum)
     expenses.value.push(newAct)
     newName.value = ''
     chosenCategory.value = ''
-    newCost.value = 0
+    newCost.value = ''
 }
 
 async function removeExpense(id) {
@@ -64,7 +63,7 @@ async function fetchExpenses() {
         <form @submit.prevent="addExpense">
             <input v-model="newName" placeholder="Expense name" required />
             <CategorySelect v-model="chosenCategory" required />
-            <input v-model.number="newCost" type="number" placeholder="Cost" required />
+            <input class="cost-input" v-model="newCost" type="number" placeholder="Cost" required />
             <button type="submit" id="add-expense-button">Add</button>
         </form>
 
@@ -85,7 +84,7 @@ async function fetchExpenses() {
                     <tr v-for="act in expenses" :key="act.id">
                         <td>{{ act.name }}</td>
                         <td>{{ act.category }}</td>
-                        <td>{{ act.cost.toFixed(2) }}</td>
+                        <td class="cost-col">{{ act.cost.toFixed(2) }}</td>
                         <td>
                             <button @click="removeExpense(act.id)">X</button>
                         </td>
@@ -126,10 +125,10 @@ input, select, button {
   /* give them all the same base sizing */
   min-width: 120px;
   padding: 0.5rem;
-  text-align: center;    /* center the placeholder / typed text */
   border-radius: 5px;
   border: 1px solid #999;
 }
+
 
 
 #add-expense-button {
@@ -165,9 +164,24 @@ input, select, button {
     border-bottom: 2px solid #ccc;
 }
 
+
+.cost-input{
+  text-align: right;
+  padding-right: 15px;
+}
+
+th.cost-col,
+td.cost-col {
+  text-align: right;
+}
+
 th,
 td {
     border: 1px solid #ccc;
     padding: 0.5rem;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
 }
 </style>
