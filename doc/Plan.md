@@ -15,19 +15,26 @@
 * Essential
     * pages to manually enter past income and expenses [Done]
     * Show a chart of percentage expenses by expense category [In progress]
-    * Dashboard for navigation (using Vue) [NavBar, Needs work]
+    * Dashboard for navigation (using Vue) [Needs work]
 * Nice-to-Have
     * Automatically calculate supposed wealth and compare it to a user statement of wealth to alert for unaccounted incomes/expenditures
     * Comparison to a statistic based/user desired normal expense chart, and highlight overspending/underspending per category.
-    * Calculators to simulate future wealth if saved (savings, retirement accounts, etc.) [Done]
+    * Calculators to simulate future wealth if saved (savings, retirement accounts, etc.) [Starting]
     * Server to hold expense data [Done]
     * Login/Account feature using server [Starting]
-    * Page for budget creation, can help with the alerts [Done]
+    * Page for budget creation, can help with the alerts
 * Stretch
     * OCR implementation
     * Web-scraping for stock information to recommend investment options with liquid assets
     * Chatbot companion to help navigate the app
     * Combo of Financial Advisor and Fantasy Football Assistant
+* Feedbacks
+    * (Done) Left justify input contents, right justify money
+    * (Done) Less garish colors
+    * (Done) Category dropdown can be tabbed to
+    * (Done) Cat add menu has black text
+    * search function for expenses and plans
+    * (Done) More spacing for savings plan
 
 ## Project Architecture
 * Dashboard with feature buttons

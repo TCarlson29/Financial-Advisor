@@ -10,7 +10,7 @@
   
   <style>
   body {
-    background: linear-gradient(135deg, #157525, #bdd509);
+    background: linear-gradient(135deg, #0e4a18, #1577296b);
   }
   #theContainer {
     text-align: center;
