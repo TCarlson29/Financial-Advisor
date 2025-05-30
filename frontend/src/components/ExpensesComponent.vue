@@ -171,7 +171,7 @@ button {
     overflow-y: auto;
     /* scroll only when needed */
     /* optional visual styling */
-    background-color: #507f57;
+    background-color: transparent;
     border-top: 1px solid #ddd;
     margin-top: 1rem;
 }
