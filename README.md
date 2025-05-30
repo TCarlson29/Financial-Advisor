@@ -1,21 +1,48 @@
 # Financial-Advisor
 
-To use: 
-download venv:
-    Windows: py -3 -m venv .venv
-    IOS: python -m venv .venv
+## Description
 
-at root, activate .venv: 
-powershell: .\.venv\Scripts\activate.bat
-Bash/WSL: source .venv/bin/activate
-(change Scripts/bin with the other as needed based on which folder has the activate file)
+Our project is a small-scale financial app that can help you save, budget, and keep track of expenses. 
 
-(only once needed for every run now and future) pip install -r backend/requirements.txt
+## Getting Started
 
-cd backend, then 'uvicorn main:app --reload'
-install npm and update it
-new terminal, cd frontend, and 'npm run dev'
-visit: http://localhost:5173
+### Quick Start with Docker
 
-database usage:
-python database.py or python backend/database.py
+From the **project root** (where this README.md lives), run:
+
+```bash
+docker-compose up --build
+```
+
+- The **backend** (FastAPI + SQLAlchemy) will be available on port **8000**.
+- The **frontend** (Vue) will be available on port **5173**.
+
+Open your browser and navigate to:
+
+> http://localhost:5173
+
+For more in depth information on how to run the files, refer to doc/development.md and doc/running.md
+
+## Existing Features
+
+* Navigation bar
+
+#### Expenses Page
+* Manually entering expenses
+* Displaying expenses as table and charts/graphs
+* Expenses can be put into categories, new categories can be manually added
+
+#### Budget Page
+* Budgeting table grouped by category, comparing total expenses in each category to manually entered budget goal
+* Automatic comparison between total expenses per category and budget goal with feedback
+
+#### Savings Page
+* Manually entered savings plan (amount spend, interest, duration, etc.)
+* Automatic calculation of money gained from each savings plan
+* Table to keep track of different savings plans
+
+## Todo List
+
+* Search bar for expenses and savings
+* Drop down to switch between chart types
+* Additional UI changes (color changes, page layout)
