@@ -23,6 +23,9 @@ const chartData = computed(() => {
   return Object.entries(map).map(([label, value]) => ({ label, value }))
 })
 
+const maxRows = ref(7);
+// expense list row height for styling
+const rowHeightPx = 40;
 
 // POST expense
 async function createExpense(name, category, cost) {
