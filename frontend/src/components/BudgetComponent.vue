@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref, reactive, computed } from 'vue'
 
-const BASE = import.meta.env.VITE_API_BASE_URL
+const BASE = "http://localhost:8000"
 const expenses = ref([])
 const budgets = reactive({})
 const categories = ref([])

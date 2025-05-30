@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue'
-const BASE = import.meta.env.VITE_API_BASE_URL
+const BASE = "http://localhost:8000"
 import CategorySelect from './CategorySelect.vue'
 import Charts from './Charts.vue'
 

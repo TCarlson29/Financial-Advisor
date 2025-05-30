@@ -44,7 +44,7 @@ import { defineProps, defineEmits, ref, watch, onMounted,  nextTick } from 'vue'
 const props = defineProps({ modelValue: String })
 const emit = defineEmits(['update:modelValue'])
 
-const BASE = import.meta.env.VITE_API_BASE_URL
+const BASE = "http://localhost:8000"
 const categories = ref([])
 const selected = ref(props.modelValue)
 const currentIdx = ref(0)
