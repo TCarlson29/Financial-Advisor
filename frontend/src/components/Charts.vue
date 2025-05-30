@@ -8,20 +8,12 @@
 <script>
 import { computed } from 'vue'
 import { Bar, Pie } from 'vue-chartjs'
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  BarElement,
-  CategoryScale,
-  LinearScale
-} from 'chart.js'
+import ChartJS from 'chart.js/auto'
 
-ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale)
+// ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale)
 
 export default {
+  components: { Bar, Pie },
   name: 'Charts',
   props: {
     chartInput: {
@@ -61,10 +53,15 @@ export default {
 
 <style scoped>
 .charts {
+  max-width: 400px;
+  max-height: 300px;
   display: flex;
   flex-wrap: wrap;
+  flex-direction: row;
   gap: 30px;
+  align-self: center;
   justify-content: center;
   margin-top: 2rem;
+  color: white;
 }
 </style>

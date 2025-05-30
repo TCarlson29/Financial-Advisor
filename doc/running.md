@@ -33,3 +33,15 @@ To stop and remove containers, networks, and volumes:
 ```bash
 docker-compose down
 ```
+
+---
+
+## Updating the App
+
+After updating, run the docker-compose down and up --build, and navigate to exactly http://localhost:5173 so that the buttons can call on the API methods correctly in order
+
+```bash
+docker-compose down
+docker-compose up --build
+http://localhost:5173 
+```
