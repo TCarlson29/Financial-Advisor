@@ -34,12 +34,12 @@ async function addExpense() {
     //     chosenCategory.value,
     //     newCost.value
     // );
-    const costNum = parseFloat(newCost)
+    const costNum = parseFloat(newCost.value)
     const newAct  = await createExpense(newName.value, chosenCategory.value, costNum)
     expenses.value.push(newAct)
     newName.value = ''
     chosenCategory.value = ''
-    newCost.value = 'Cost'
+    newCost.value = ''
 }
 
 async function removeExpense(id) {

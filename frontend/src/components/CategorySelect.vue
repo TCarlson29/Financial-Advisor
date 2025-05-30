@@ -18,7 +18,7 @@
         <!-- stopPropagation so clicking X doesn’t select -->
         <button type="button" class="del-btn" aria-label="Delete category" @click.stop="removeCategory(cat.id)">×</button>
       </li>
-      <li class="dropdown-item add-new" tabindex="-1" @keydown.enter.prevent="openAddDialog()"
+      <li class="dropdown-item add-new" tabindex="0" @keydown.enter.prevent="openAddDialog()"
         @click.stop="showDialog = true, open = false">
         + Add new category…
       </li>
@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, watch, onMounted } from 'vue'
+import { defineProps, defineEmits, ref, watch, onMounted,  nextTick } from 'vue'
 
 const props = defineProps({ modelValue: String })
 const emit = defineEmits(['update:modelValue'])
@@ -84,6 +84,9 @@ async function fetchCategories() {
 
 function toggle() {
   open.value = !open.value
+  if (open.value) {
+    nextTick(() => focusItem(0))
+  }
 }
 
 function close() {
