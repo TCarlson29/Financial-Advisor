@@ -29,11 +29,25 @@
     * Chatbot companion to help navigate the app
     * Combo of Financial Advisor and Fantasy Football Assistant
 * Feedbacks
+    * search function for expenses and plans
+    * number inputs should support decimals and strip symbols like '$'
+    * Add dummy database for expenses and savings so Jeff will have an easier time testing things out
+    *  Clicking something deletes the pir chart? [Couldn't replicate bug so far]
+    * Bigger graphs, with backgrounds and/or recolor for redability. Display both at once would be nice
+    * Adding duplicate categories has SQLAlchemy error in console, add that to app
+    * Budget shows exceeded by how much
+    * A way to show everything at once
+    * Text explanation of savings selection for those unfamiliar with finance
+    * About page/add to home page
+    * Maybe login feature
+    * Alert on expenses page when budget exceeded
+    * Editing features for expenses and savings
+    * Savings crashes when final value is too large
+* Completed feedbacks
     * (Done) Left justify input contents, right justify money
     * (Done) Less garish colors
     * (Done) Category dropdown can be tabbed to
     * (Done) Cat add menu has black text
-    * search function for expenses and plans
     * (Done) More spacing for savings plan
 
 ## Project Architecture
