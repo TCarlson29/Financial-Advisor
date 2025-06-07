@@ -2,8 +2,11 @@
 from sqlalchemy.orm import Session
 from backend import models, schemas
 
-def get_expenses(db: Session):
-    return db.query(models.Expense).all()
+def get_expenses(db: Session, search: str | None = None):
+    q = db.query(models.Expense)
+    if search:
+        q = q.filter(models.Expense.name.ilike(f"%{search}%"))
+    return q.all()
 
 def create_expense(db: Session, exp: schemas.ExpenseCreate):
     db_exp = models.Expense(name=exp.name, category =exp.category, cost=exp.cost)

@@ -71,6 +71,7 @@ function calculateFinalAmount(principal, timeSaved, timeSavedUnit, percentRate, 
     } else if (rateType === "Compound") {
         final = principal * Math.pow((1 + rate), correctTimeSaved)
     }
+    final = Math.floor(final)
 
     return final
 }
@@ -161,11 +162,12 @@ async function fetchSavings() {
                     </div>
                     <div id="savings-amount">
                         Amount of saved money:
-                        <input v-model.number="newAmount" type="number" placeholder="0.00" required />
+                        <input v-model.number="newAmount" type="number" step="any" min="0" max="1000000000"
+                            placeholder="0.00" required />
                     </div>
                     <div id="time-saved">
                         Saving Duration:
-                        <input v-model.number="newTimeSaved" type="number" placeholder="Time Saved" required />
+                        <input v-model.number="newTimeSaved" type="number" step="any" min="0" max="150" placeholder="0" required />
 
                         <select v-model="newTimeSavedUnit" required>
                             <option disabled value=""> Time Unit</option>
@@ -174,7 +176,7 @@ async function fetchSavings() {
                     </div>
                     <div id="savings-rate">
                         Rates of interest (%):
-                        <input v-model.number="newRate" type="number" placeholder="Rate" required />
+                        <input v-model.number="newRate" type="number" step="any" min="0" max="30" placeholder="0.00" required />
 
                         <select v-model="newRateTimeUnit" required>
                             <option disabled value=""> Time Unit</option>

@@ -1,10 +1,12 @@
 <script setup>
-import { onMounted, ref, computed } from 'vue'
-const BASE = "http://localhost:8000"
+import { onMounted, ref, computed, watch } from 'vue'
+import { debounce } from 'lodash-es'
 import CategorySelect from './CategorySelect.vue'
 import Charts from './Charts.vue'
+const BASE = "http://localhost:8000"
 
 let id = 0
+const searchTerm = ref('')
 const newName = ref('')
 const chosenCategory = ref('')
 const newCost = ref('')
@@ -65,9 +67,15 @@ onMounted(async () => {
     await fetchExpenses();
 })
 
+const onSearch = debounce(() => {
+    fetchExpenses(searchTerm.value)
+}, 300)
+
 // GET expenses
-async function fetchExpenses() {
-    const res = await fetch(`${BASE}/api/expenses`)
+async function fetchExpenses(search = "") {
+    const url = new URL(`${BASE}/api/expenses`);
+    if (search) url.searchParams.set("search", search);
+    const res = await fetch(url);
     expenses.value = await res.json()
 }
 </script>
@@ -78,7 +86,11 @@ async function fetchExpenses() {
         <form @submit.prevent="addExpense">
             <input v-model="newName" placeholder="Expense name" required />
             <CategorySelect v-model="chosenCategory" required />
-            <input class="cost-input" v-model="newCost" type="number" placeholder="Cost" required />
+            <input class="cost-input" v-model.number="newCost" type="number" step="any"
+            placeholder="Cost"
+            inputmode="decimal"
+            required
+            />
             <button type="submit" id="add-expense-button">Add</button>
         </form>
 
@@ -99,6 +111,12 @@ async function fetchExpenses() {
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td>
+                                <input v-model="searchTerm" @input="onSearch" placeholder="🔍 Search expenses…"
+                                    style="margin-bottom:1rem" />
+                            </td>
+                        </tr>
                         <tr v-for="act in expenses" :key="act.id">
                             <td>{{ act.name }}</td>
                             <td>{{ act.category }}</td>
@@ -157,10 +175,10 @@ button {
 }
 
 .expense-summary {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  gap: 50px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    gap: 50px;
 }
 
 /* this is your scrollable container */
