@@ -41,8 +41,8 @@ nav {
     top: 0;
     left: 0;
     width: 100%;
-    background: #f0f0f0;
-    padding: 10px 20px;
+    background-color: var(--site-bg-color);
+    padding: 0; 
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1000;
 }
@@ -52,20 +52,31 @@ ul {
     margin: 0;
     padding: 0;
     display: flex;
-    flex-wrap: wrap;
-}
-
-.group-header {
     width: 100%;
-    font-weight: bold;
-    margin: 8px 0 4px;
 }
 
 li {
-    margin-right: 20px;
+    flex: 1;
+}
+
+a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    color: inherit;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+a:hover {
+    background-color: rgba(60, 130, 94, 0.4);
 }
 
 a.router-link-active {
+    background-color: rgba(60, 130, 94, 0.7);
     font-weight: bold;
+    color: white;
 }
 </style>
