@@ -73,7 +73,13 @@ async function saveBudget(cat) {
                         'exceeded': (totalsByCategory[cat] || 0) > (budgets[cat] || 0)
                     }">
                         <!-- within or exceeded -->
-                        {{ (totalsByCategory[cat] || 0) <= (budgets[cat] || 0) ? 'Within' : 'Exceeded' }} </td>
+                        <template v-if="(totalsByCategory[cat] || 0) <= (budgets[cat] || 0)">
+                            Within
+                        </template>
+                        <template v-else>
+                            Exceeded By {{ (totalsByCategory[cat] || 0) - (budgets[cat] || 0).toFixed(2) }}
+                        </template>
+                    </td>
                 </tr>
             </tbody>
         </table>
