@@ -1,9 +1,10 @@
 # backend/routers/savings.py
-from typing import List
-from fastapi import APIRouter, Depends, HTTPException
+from typing import List, Optional
+from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import cast, String
 
-from backend import crud, schemas
+from backend import crud, schemas, models
 from backend.database import get_db
 
 router = APIRouter(

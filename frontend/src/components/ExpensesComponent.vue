@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, computed, watch } from 'vue'
+import { onMounted, ref, computed, reactive, watch } from 'vue'
 import { debounce } from 'lodash-es'
 import CategorySelect from './CategorySelect.vue'
 import Charts from './Charts.vue'
@@ -15,6 +15,14 @@ const totalCost = computed(() =>
     expenses.value.reduce((sum, e) => sum + (e.cost ?? 0), 0)
 )
 
+// Add new columns here as needed
+const filters = reactive({
+    name: '',
+    category: '',
+    cost_min: '',
+    cost_max: ''
+})
+
 // Chart Data
 const chartData = computed(() => {
     const map = {}
@@ -25,9 +33,6 @@ const chartData = computed(() => {
     return Object.entries(map).map(([label, value]) => ({ label, value }))
 })
 
-const maxRows = ref(7);
-// expense list row height for styling
-const rowHeightPx = 40;
 
 // POST expense
 async function createExpense(name, category, cost) {
@@ -46,11 +51,6 @@ async function deleteExpense(id) {
 }
 
 async function addExpense() {
-    // const newAct = await createExpense(
-    //     newName.value,
-    //     chosenCategory.value,
-    //     newCost.value
-    // );
     const costNum = parseFloat(newCost.value)
     const newAct = await createExpense(newName.value, chosenCategory.value, costNum)
     expenses.value.push(newAct)
@@ -63,21 +63,26 @@ async function removeExpense(id) {
     await deleteExpense(id)
 }
 
+
+// GET expenses
+async function fetchExpenses() {
+    const url = new URL(`${BASE}/api/expenses`)
+    if (filters.name) url.searchParams.set("name", filters.name)
+    if (filters.category) url.searchParams.set("category", filters.category)
+    if (filters.cost_min) url.searchParams.set("cost_min", filters.cost_min)
+    if (filters.cost_max) url.searchParams.set("cost_max", filters.cost_max)
+
+    const res = await fetch(url)
+    expenses.value = await res.json()
+}
+
+const debouncedFetch = debounce(fetchExpenses, 300)
+
+watch(filters, debouncedFetch)
+
 onMounted(async () => {
     await fetchExpenses();
 })
-
-const onSearch = debounce(() => {
-    fetchExpenses(searchTerm.value)
-}, 300)
-
-// GET expenses
-async function fetchExpenses(search = "") {
-    const url = new URL(`${BASE}/api/expenses`);
-    if (search) url.searchParams.set("search", search);
-    const res = await fetch(url);
-    expenses.value = await res.json()
-}
 </script>
 
 <template>
@@ -86,11 +91,8 @@ async function fetchExpenses(search = "") {
         <form @submit.prevent="addExpense">
             <input v-model="newName" placeholder="Expense name" required />
             <CategorySelect v-model="chosenCategory" required />
-            <input class="cost-input" v-model.number="newCost" type="number" step="any"
-            placeholder="Cost"
-            inputmode="decimal"
-            required
-            />
+            <input class="cost-input" v-model.number="newCost" type="number" step="any" placeholder="Cost"
+                inputmode="decimal" required />
             <button type="submit" id="add-expense-button">Add</button>
         </form>
 
@@ -104,19 +106,24 @@ async function fetchExpenses(search = "") {
                 <table>
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Cost</th>
+                            <th>
+                                Name<br />
+                                <input v-model="filters.name" placeholder="Search Name" />
+                            </th>
+                            <th>
+                                Category<br />
+                                <input v-model="filters.category" placeholder="Search Category" />
+                            </th>
+                            <th>
+                                Cost<br />
+                                <input v-model="filters.cost_min" type="number" step="any" placeholder="Min Cost" />
+                                -
+                                <input v-model="filters.cost_max" type="number" step="any" placeholder="Max Cost" />
+                            </th>
                             <th>Remove</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>
-                                <input v-model="searchTerm" @input="onSearch" placeholder="🔍 Search expenses…"
-                                    style="margin-bottom:1rem" />
-                            </td>
-                        </tr>
                         <tr v-for="act in expenses" :key="act.id">
                             <td>{{ act.name }}</td>
                             <td>{{ act.category }}</td>

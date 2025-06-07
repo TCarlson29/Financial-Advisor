@@ -1,11 +1,26 @@
-# crud.py
+# backend/crud.py
 from sqlalchemy.orm import Session
 from backend import models, schemas
+from sqlalchemy import func, cast, String
 
-def get_expenses(db: Session, search: str | None = None):
+def get_expenses(
+    db: Session,
+    name: str | None = None,
+    category: str | None = None,
+    cost_min: float | None = None,
+    cost_max: float | None = None,
+):
     q = db.query(models.Expense)
-    if search:
-        q = q.filter(models.Expense.name.ilike(f"%{search}%"))
+
+    if name:
+        q = q.filter(models.Expense.name.ilike(f"%{name}%"))
+    if category:
+        q = q.filter(models.Expense.category.ilike(f"%{category}%"))
+    if cost_min is not None:
+        q = q.filter(models.Expense.cost >= cost_min)
+    if cost_max is not None:
+        q = q.filter(models.Expense.cost <= cost_max)
+
     return q.all()
 
 def create_expense(db: Session, exp: schemas.ExpenseCreate):

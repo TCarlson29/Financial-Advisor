@@ -13,10 +13,13 @@ router = APIRouter(
 
 @router.get("/", response_model=List[schemas.ExpenseRead])
 def list_expenses(
-    search: Optional[str] = Query(None, description="name substring"),
     db: Session = Depends(get_db),
+    name: Optional[str] = Query(None, description="substring match in name"),
+    category: Optional[str] = Query(None, description="substring match in category"),
+    cost_min: Optional[float] = Query(None, alias="cost_min"),
+    cost_max: Optional[float] = Query(None, alias="cost_max"),
 ):
-    return crud.get_expenses(db, search)
+    return crud.get_expenses(db, name, category, cost_min, cost_max)
 
 @router.post("/", response_model=schemas.ExpenseRead)
 def create_expense(
