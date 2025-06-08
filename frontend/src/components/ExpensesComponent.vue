@@ -87,18 +87,20 @@ onMounted(async () => {
 
 <template>
     <div id="expense-tracker">
-        <h1>Expenses Tracker</h1>
-        <form @submit.prevent="addExpense">
-            <input v-model="newName" placeholder="Expense name" required />
-            <CategorySelect v-model="chosenCategory" required />
-            <input class="cost-input" v-model.number="newCost" type="number" step="any" placeholder="Cost"
-                inputmode="decimal" required />
-            <button type="submit" id="add-expense-button">Add</button>
-        </form>
+        <div class="expense-head">
+            <h1>Expenses Tracker</h1>
+            <form @submit.prevent="addExpense">
+                <input v-model="newName" placeholder="Expense name" required />
+                <CategorySelect v-model="chosenCategory" required />
+                <input class="cost-input" v-model.number="newCost" type="number" step="any" placeholder="Cost"
+                    inputmode="decimal" required />
+                <button type="submit" id="add-expense-button">Add</button>
+            </form>
 
-        <h2>
-            Total: {{ totalCost.toFixed(2) }}
-        </h2>
+            <h2>
+                Total: {{ totalCost.toFixed(2) }}
+            </h2>
+        </div>
 
         <div class="expense-summary">
 
@@ -140,15 +142,26 @@ onMounted(async () => {
                     </tbody>
                 </table>
             </div>
-            <Charts :chartInput="chartData" />
+            <div class="expense-chart">
+                <Charts :chartInput="chartData" />
+            </div>
         </div>
     </div>
 </template>
 
 
 <style scoped>
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
 #expense-tracker {
     display: flex;
+    flex: 0 0 auto;
     flex-direction: column;
     align-items: center;
     margin: 10px auto;
@@ -186,8 +199,18 @@ button {
     max-width: 80px;
 }
 
+.expense-head {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+}
+
 .expense-summary {
     display: flex;
+    flex: 1 1 auto;
     flex-wrap: wrap;
     flex-direction: row;
     gap: 50px;
@@ -196,7 +219,7 @@ button {
 
 .expense-list {
     max-height: 350px;
-    flex: 1 1 auto;
+    flex: 3 1 0;
     /* take up all remaining space */
     overflow-y: auto;
     /* scroll only when needed */
@@ -216,7 +239,7 @@ button {
 
 .expense-list th,
 .expense-list td {
-  width: 25%;
+    width: 25%;
 }
 
 .expense-list thead th {
@@ -228,22 +251,27 @@ button {
     border-bottom: 2px solid #ccc;
 }
 
+.expense-chart {
+    flex: 1 1 0;
+    /* overflow-y: auto; */
+}
+
 
 
 .expense-filter {
-  width: 100%;
-  box-sizing: border-box; 
-  margin-bottom: 0.25rem; 
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 0.25rem;
 }
 
 .expense-filter--half {
-  width: calc(50% - 4px); 
-  display: inline-block;
-  margin-right: 8px; 
+    width: calc(50% - 4px);
+    display: inline-block;
+    margin-right: 8px;
 }
 
 .expense-filter--half:last-child {
-  margin-right: 0;
+    margin-right: 0;
 }
 
 .cost-input {
@@ -259,10 +287,11 @@ td.cost-col {
 th,
 td {
     border: 1px solid #ccc;
+    flex-wrap: wrap;
     padding: 0.5rem;
 }
 
-.action-btn{
+.action-btn {
     width: 25%;
 }
 
