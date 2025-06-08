@@ -206,6 +206,8 @@ function focusPrev() {
   line-height: 1;
   cursor: pointer;
   color: #900;
+  border-color: black;
+  width: 25%;
 }
 
 /* add-new row styling */

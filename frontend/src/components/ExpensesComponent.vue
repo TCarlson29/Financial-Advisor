@@ -1,10 +1,12 @@
 <script setup>
-import { onMounted, ref, computed } from 'vue'
-const BASE = "http://localhost:8000"
+import { onMounted, ref, computed, reactive, watch } from 'vue'
+import { debounce } from 'lodash-es'
 import CategorySelect from './CategorySelect.vue'
 import Charts from './Charts.vue'
+const BASE = "http://localhost:8000"
 
 let id = 0
+const searchTerm = ref('')
 const newName = ref('')
 const chosenCategory = ref('')
 const newCost = ref('')
@@ -12,6 +14,14 @@ const expenses = ref([])
 const totalCost = computed(() =>
     expenses.value.reduce((sum, e) => sum + (e.cost ?? 0), 0)
 )
+
+// Add new columns here as needed
+const filters = reactive({
+    name: '',
+    category: '',
+    cost_min: '',
+    cost_max: ''
+})
 
 // Chart Data
 const chartData = computed(() => {
@@ -23,9 +33,6 @@ const chartData = computed(() => {
     return Object.entries(map).map(([label, value]) => ({ label, value }))
 })
 
-const maxRows = ref(7);
-// expense list row height for styling
-const rowHeightPx = 40;
 
 // POST expense
 async function createExpense(name, category, cost) {
@@ -44,11 +51,6 @@ async function deleteExpense(id) {
 }
 
 async function addExpense() {
-    // const newAct = await createExpense(
-    //     newName.value,
-    //     chosenCategory.value,
-    //     newCost.value
-    // );
     const costNum = parseFloat(newCost.value)
     const newAct = await createExpense(newName.value, chosenCategory.value, costNum)
     expenses.value.push(newAct)
@@ -61,15 +63,26 @@ async function removeExpense(id) {
     await deleteExpense(id)
 }
 
-onMounted(async () => {
-    await fetchExpenses();
-})
 
 // GET expenses
 async function fetchExpenses() {
-    const res = await fetch(`${BASE}/api/expenses`)
+    const url = new URL(`${BASE}/api/expenses`)
+    if (filters.name) url.searchParams.set("name", filters.name)
+    if (filters.category) url.searchParams.set("category", filters.category)
+    if (filters.cost_min) url.searchParams.set("cost_min", filters.cost_min)
+    if (filters.cost_max) url.searchParams.set("cost_max", filters.cost_max)
+
+    const res = await fetch(url)
     expenses.value = await res.json()
 }
+
+const debouncedFetch = debounce(fetchExpenses, 300)
+
+watch(filters, debouncedFetch)
+
+onMounted(async () => {
+    await fetchExpenses();
+})
 </script>
 
 <template>
@@ -78,7 +91,8 @@ async function fetchExpenses() {
         <form @submit.prevent="addExpense">
             <input v-model="newName" placeholder="Expense name" required />
             <CategorySelect v-model="chosenCategory" required />
-            <input class="cost-input" v-model="newCost" type="number" placeholder="Cost" required />
+            <input class="cost-input" v-model.number="newCost" type="number" step="any" placeholder="Cost"
+                inputmode="decimal" required />
             <button type="submit" id="add-expense-button">Add</button>
         </form>
 
@@ -99,12 +113,28 @@ async function fetchExpenses() {
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td>
+                                <input class="expense-filter" v-model="filters.name" placeholder="Search Name" />
+                            </td>
+                            <td>
+                                <input class="expense-filter" v-model="filters.category"
+                                    placeholder="Search Category" />
+                            </td>
+                            <td>
+                                <input class="expense-filter expense-filter--half" v-model.number="filters.cost_min"
+                                    type="number" step="any" placeholder="Min Cost" />
+                                <input class="expense-filter expense-filter--half" v-model.number="filters.cost_max"
+                                    type="number" step="any" placeholder="Max Cost" />
+                            </td>
+                            <td></td>
+                        </tr>
                         <tr v-for="act in expenses" :key="act.id">
                             <td>{{ act.name }}</td>
                             <td>{{ act.category }}</td>
                             <td class="cost-col">{{ act.cost.toFixed(2) }}</td>
                             <td>
-                                <button @click="removeExpense(act.id)">X</button>
+                                <button class="action-btn" @click="removeExpense(act.id)">X</button>
                             </td>
                         </tr>
                     </tbody>
@@ -144,7 +174,7 @@ input,
 select,
 button {
     /* give them all the same base sizing */
-    min-width: 120px;
+    min-width: 30px;
     padding: 0.5rem;
     border-radius: 5px;
     border: 1px solid #999;
@@ -157,13 +187,13 @@ button {
 }
 
 .expense-summary {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  gap: 50px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    gap: 50px;
 }
 
-/* this is your scrollable container */
+
 .expense-list {
     max-height: 350px;
     flex: 1 1 auto;
@@ -181,6 +211,12 @@ button {
     width: 100%;
     color: white;
     border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.expense-list th,
+.expense-list td {
+  width: 25%;
 }
 
 .expense-list thead th {
@@ -192,6 +228,23 @@ button {
     border-bottom: 2px solid #ccc;
 }
 
+
+
+.expense-filter {
+  width: 100%;
+  box-sizing: border-box; 
+  margin-bottom: 0.25rem; 
+}
+
+.expense-filter--half {
+  width: calc(50% - 4px); 
+  display: inline-block;
+  margin-right: 8px; 
+}
+
+.expense-filter--half:last-child {
+  margin-right: 0;
+}
 
 .cost-input {
     text-align: right;
@@ -207,6 +260,10 @@ th,
 td {
     border: 1px solid #ccc;
     padding: 0.5rem;
+}
+
+.action-btn{
+    width: 25%;
 }
 
 input[type=number] {

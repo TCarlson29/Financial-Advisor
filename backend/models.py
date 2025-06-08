@@ -36,6 +36,6 @@ class Savings(Base):
     rate: Mapped[float] = mapped_column(Float, nullable=False)
     rate_time_unit: Mapped[str] = mapped_column(String, nullable=False)
     rate_type: Mapped[str] = mapped_column(String, nullable=False)
-    final: Mapped[float] = mapped_column(Float, nullable=False)
-    gain: Mapped[float] = mapped_column(Float, nullable=False)
+    final: Mapped[str] = mapped_column(String, nullable=False)
+    gain: Mapped[str] = mapped_column(String, nullable=False)
 
