@@ -15,6 +15,9 @@ const newRate = ref(0)
 const newRateTimeUnit = ref('')
 const newRateType = ref('')
 
+const isEditing = ref(false)
+const editSavingsId = ref(null)
+
 const finalAmount = computed(() => {
     const t = calculateFinalAmount(
         newAmount.value,
@@ -105,6 +108,36 @@ async function createSaving(
     return fetch(`${BASE}/api/savings`, opts).then(r => r.json())
 }
 
+// PUT savings
+async updateSavings(
+    id,
+    name,
+    amount,
+    time_saved,
+    time_saved_unit,
+    rate,
+    rate_time_unit,
+    rate_type,
+    final,
+    gain
+) {
+    const ops = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            name,
+            amount,
+            time_saved,
+            time_saved_unit,
+            rate,
+            rate_time_unit,
+            rate_type,
+            final,
+            gain
+        })
+    }
+    await fetch('${BASE}/api/savings/${id}', opts)
+}
 
 // DELETE saving
 async function deleteSaving(id) {
@@ -112,26 +145,38 @@ async function deleteSaving(id) {
     savings.value = savings.value.filter(a => a.id !== id)
 }
 
+
 async function addSaving() {
-    const newSave = await createSaving(
-        newName.value,
-        newAmount.value,
-        newTimeSaved.value,
-        newTimeSavedUnit.value,
-        newRate.value,
-        newRateTimeUnit.value,
-        newRateType.value,
-        finalAmount.value,
-        gain.value
-    );
-    savings.value.push(newSave)
-    newName.value = ''
-    newAmount.value = 0
-    newTimeSaved.value = 0
-    newTimeSavedUnit.value = ''
-    newRate.value = 0
-    newRateTimeUnit.value = ''
-    newRateType.value = ''
+    if (isEditing.value) {
+        await updateSavings(
+            editSavingsId.value,
+            newName.value,
+            newAmount.value,
+            newTimeSaved.value,
+            newTimeSavedUnit.value,
+            newRate.value,
+            newRateTimeUnit.value,
+            newRateType.value,
+            finalAmount.value,
+            gain.value
+        )
+        isEditing.value = false
+        editSavingsId = null
+    } else {
+        const newSave = await createSaving(
+            newName.value,
+            newAmount.value,
+            newTimeSaved.value,
+            newTimeSavedUnit.value,
+            newRate.value,
+            newRateTimeUnit.value,
+            newRateType.value,
+            finalAmount.value,
+            gain.value
+        )
+        savings.value.push(newSave)
+    }
+    clearForm()
 }
 
 async function removeSaving(id) {
@@ -147,6 +192,31 @@ async function fetchSavings() {
     const res = await fetch(`${BASE}/api/savings`)
     savings.value = await res.json()
 }
+
+// Populate form while editing
+function editSaving(saving) {
+    newName.value = saving.name
+    newAmount.value = saving.amount
+    newTimeSaved.value = saving.time_saved
+    newTimeSavedUnit.value = saving.time_saved_unit
+    newRate.value = saving.rate
+    newRateTimeUnit.value = saving.rate_time_unit
+    newRateType.value = saving.rate_type
+    isEditing.value = true
+    editSavingId.value = saving.id
+}
+
+// Clear form after editing
+function clearForm() {
+    newName.value = ''
+    newAmount.value = 0
+    newTimeSaved.value = 0
+    newTimeSavedUnit.value = ''
+    newRate.value = 0
+    newRateTimeUnit.value = ''
+    newRateType.value = ''
+}
+
 </script>
 
 <template>
@@ -199,7 +269,7 @@ async function fetchSavings() {
                 </div>
             </div>
 
-            <button type="submit" id="add-saving-button">Add Plan</button>
+            <button type="submit" id="add-saving-button">{{ isEditing ? 'Update Plan' : 'Add Plan' }}</button>
         </form>
 
         <div class="saving-list">
@@ -226,6 +296,9 @@ async function fetchSavings() {
                             <span :class="{ exceeded: s.gain < 0 }">
                                 {{ s.gain.toFixed(2) }}
                             </span>
+                        </td>
+                        <td class="edit-col">
+                            <button@click="editSaving(s)">Edit</button>
                         </td>
                         <td class="del-col">
                             <button @click="removeSaving(s.id)">X</button>
