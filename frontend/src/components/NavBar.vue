@@ -41,7 +41,7 @@ nav {
     top: 0;
     left: 0;
     width: 100%;
-    background-color: var(--site-bg-color);
+    background-color: rgba(164, 164, 164, 0.7);
     padding: 0; 
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1000;
