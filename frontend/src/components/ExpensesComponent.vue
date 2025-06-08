@@ -15,7 +15,7 @@ const totalCost = computed(() =>
     expenses.value.reduce((sum, e) => sum + (e.cost ?? 0), 0)
 )
 
-// Add new columns here as needed
+// All filters
 const filters = reactive({
     name: '',
     category: '',
@@ -117,16 +117,16 @@ onMounted(async () => {
                     <tbody>
                         <tr>
                             <td>
-                                <input class="expense-filter" v-model="filters.name" placeholder="Search Name" />
+                                <input class="table-filter" v-model="filters.name" placeholder="Search Name" />
                             </td>
                             <td>
-                                <input class="expense-filter" v-model="filters.category"
+                                <input class="table-filter" v-model="filters.category"
                                     placeholder="Search Category" />
                             </td>
                             <td>
-                                <input class="expense-filter expense-filter--half" v-model.number="filters.cost_min"
+                                <input class="table-filter table-filter--half" v-model.number="filters.cost_min"
                                     type="number" step="any" placeholder="Min Cost" />
-                                <input class="expense-filter expense-filter--half" v-model.number="filters.cost_max"
+                                <input class="table-filter table-filter--half" v-model.number="filters.cost_max"
                                     type="number" step="any" placeholder="Max Cost" />
                             </td>
                             <td></td>
@@ -258,19 +258,19 @@ button {
 
 
 
-.expense-filter {
+.table-filter {
     width: 100%;
     box-sizing: border-box;
     margin-bottom: 0.25rem;
 }
 
-.expense-filter--half {
+.table-filter--half {
     width: calc(50% - 4px);
     display: inline-block;
     margin-right: 8px;
 }
 
-.expense-filter--half:last-child {
+.table-filter--half:last-child {
     margin-right: 0;
 }
 

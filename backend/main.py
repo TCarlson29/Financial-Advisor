@@ -48,8 +48,8 @@ async def lifespan(app: FastAPI):
                     "rate": 1.5,
                     "rate_time_unit": "Year",       # from timeUnits
                     "rate_type": "Simple",          # from rateTypes
-                    "final": 1007.5,                # amount + (amount * rate% * (6/12))
-                    "gain": 7.5,
+                    "final": 1000.0,                # amount + (amount * rate% * (6/12))
+                    "gain": 0.0,
                 },
                 {
                     "name": "Vacation",

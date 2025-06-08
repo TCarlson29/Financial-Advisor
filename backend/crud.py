@@ -1,7 +1,7 @@
 # backend/crud.py
 from sqlalchemy.orm import Session
 from backend import models, schemas
-from sqlalchemy import func, cast, String
+from sqlalchemy import func, cast, String, Float
 
 def get_expenses(
     db: Session,
@@ -70,8 +70,64 @@ def delete_category(db: Session, c_id: int) -> bool:
     db.commit()
     return True
 
-def get_savings(db: Session) -> list[models.Savings]:
-    return db.query(models.Savings).all()
+def get_savings(
+    db: Session,
+    name:            str | None = None,
+    time_saved_unit: str | None = None,
+    rate_time_unit:  str | None = None,
+    rate_type:       str | None = None,
+
+    amount_min:      float | None = None,
+    amount_max:      float | None = None,
+    time_saved_min:  float | None = None,
+    time_saved_max:  float | None = None,
+    rate_min:        float | None = None,
+    rate_max:        float | None = None,
+    final_min:       float | None = None,
+    final_max:       float | None = None,
+    gain_min:        float | None = None,
+    gain_max:        float | None = None,
+) -> list[models.Savings]:
+    q = db.query(models.Savings)
+
+    # string fields → case-insensitive substring
+    if name:
+        q = q.filter(models.Savings.name.ilike(f"%{name}%"))
+    if time_saved_unit:
+        q = q.filter(models.Savings.time_saved_unit.ilike(f"%{time_saved_unit}%"))
+    if rate_time_unit:
+        q = q.filter(models.Savings.rate_time_unit.ilike(f"%{rate_time_unit}%"))
+    if rate_type:
+        q = q.filter(models.Savings.rate_type.ilike(f"%{rate_type}%"))
+
+    # numeric ranges → >= / <=
+    if amount_min is not None:
+        q = q.filter(models.Savings.amount >= amount_min)
+    if amount_max is not None:
+        q = q.filter(models.Savings.amount <= amount_max)
+
+    if time_saved_min is not None:
+        q = q.filter(models.Savings.time_saved >= time_saved_min)
+    if time_saved_max is not None:
+        q = q.filter(models.Savings.time_saved <= time_saved_max)
+
+    if rate_min is not None:
+        q = q.filter(models.Savings.rate >= rate_min)
+    if rate_max is not None:
+        q = q.filter(models.Savings.rate <= rate_max)
+
+    # final & gain are stored as strings, so cast to float for numeric comparison
+    if final_min is not None:
+        q = q.filter(cast(models.Savings.final, Float) >= final_min)
+    if final_max is not None:
+        q = q.filter(cast(models.Savings.final, Float) <= final_max)
+
+    if gain_min is not None:
+        q = q.filter(cast(models.Savings.gain, Float) >= gain_min)
+    if gain_max is not None:
+        q = q.filter(cast(models.Savings.gain, Float) <= gain_max)
+
+    return q.all()
 
 def create_savings(db: Session, s: schemas.SavingsCreate) -> models.Savings:
     db_savings = models.Savings(**s.model_dump())
