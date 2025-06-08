@@ -230,7 +230,7 @@ async function fetchSavings() {
                             </span>
                         </td>
                         <td class="del-col">
-                            <button @click="removeSaving(s.id)">X</button>
+                            <button class="action-btn" @click="removeSaving(s.id)">X</button>
                         </td>
                     </tr>
                 </tbody>
@@ -297,8 +297,7 @@ form {
 input,
 select,
 button {
-    /* give them all the same base sizing */
-    min-width: 120px;
+    min-width: 30px;
     padding: 0.5rem;
     /* text-align: center; */
     /* center the placeholder / typed text */
@@ -350,6 +349,10 @@ button {
 
 .saving-list .del-col {
     max-width: 500px;
+}
+
+.action-btn{
+    width:25%;
 }
 
 th,

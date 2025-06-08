@@ -106,30 +106,35 @@ onMounted(async () => {
                 <table>
                     <thead>
                         <tr>
-                            <th>
-                                Name<br />
-                                <input v-model="filters.name" placeholder="Search Name" />
-                            </th>
-                            <th>
-                                Category<br />
-                                <input v-model="filters.category" placeholder="Search Category" />
-                            </th>
-                            <th>
-                                Cost<br />
-                                <input v-model="filters.cost_min" type="number" step="any" placeholder="Min Cost" />
-                                -
-                                <input v-model="filters.cost_max" type="number" step="any" placeholder="Max Cost" />
-                            </th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Cost</th>
                             <th>Remove</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td>
+                                <input class="expense-filter" v-model="filters.name" placeholder="Search Name" />
+                            </td>
+                            <td>
+                                <input class="expense-filter" v-model="filters.category"
+                                    placeholder="Search Category" />
+                            </td>
+                            <td>
+                                <input class="expense-filter expense-filter--half" v-model.number="filters.cost_min"
+                                    type="number" step="any" placeholder="Min Cost" />
+                                <input class="expense-filter expense-filter--half" v-model.number="filters.cost_max"
+                                    type="number" step="any" placeholder="Max Cost" />
+                            </td>
+                            <td></td>
+                        </tr>
                         <tr v-for="act in expenses" :key="act.id">
                             <td>{{ act.name }}</td>
                             <td>{{ act.category }}</td>
                             <td class="cost-col">{{ act.cost.toFixed(2) }}</td>
                             <td>
-                                <button @click="removeExpense(act.id)">X</button>
+                                <button class="action-btn" @click="removeExpense(act.id)">X</button>
                             </td>
                         </tr>
                     </tbody>
@@ -169,7 +174,7 @@ input,
 select,
 button {
     /* give them all the same base sizing */
-    min-width: 120px;
+    min-width: 30px;
     padding: 0.5rem;
     border-radius: 5px;
     border: 1px solid #999;
@@ -188,7 +193,7 @@ button {
     gap: 50px;
 }
 
-/* this is your scrollable container */
+
 .expense-list {
     max-height: 350px;
     flex: 1 1 auto;
@@ -206,6 +211,12 @@ button {
     width: 100%;
     color: white;
     border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.expense-list th,
+.expense-list td {
+  width: 25%;
 }
 
 .expense-list thead th {
@@ -217,6 +228,23 @@ button {
     border-bottom: 2px solid #ccc;
 }
 
+
+
+.expense-filter {
+  width: 100%;
+  box-sizing: border-box; 
+  margin-bottom: 0.25rem; 
+}
+
+.expense-filter--half {
+  width: calc(50% - 4px); 
+  display: inline-block;
+  margin-right: 8px; 
+}
+
+.expense-filter--half:last-child {
+  margin-right: 0;
+}
 
 .cost-input {
     text-align: right;
@@ -232,6 +260,10 @@ th,
 td {
     border: 1px solid #ccc;
     padding: 0.5rem;
+}
+
+.action-btn{
+    width: 25%;
 }
 
 input[type=number] {
