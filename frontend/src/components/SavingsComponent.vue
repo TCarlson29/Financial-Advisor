@@ -109,7 +109,7 @@ async function createSaving(
 }
 
 // PUT savings
-async updateSavings(
+async function updateSavings(
     id,
     name,
     amount,
@@ -136,7 +136,8 @@ async updateSavings(
             gain
         })
     }
-    await fetch('${BASE}/api/savings/${id}', opts)
+    const response = await fetch(`${BASE}/api/savings/${id}`, ops)
+    return await response.json()
 }
 
 // DELETE saving
@@ -160,8 +161,25 @@ async function addSaving() {
             finalAmount.value,
             gain.value
         )
+
+        const index = savings.value.findIndex(s => s.id === editSavingsId.value)
+        if (index !== -1) {
+            savings.value[index] = {
+                id: editSavingsId.value,
+                name: newName.value,
+                amount: newAmount.value,
+                time_saved: newTimeSaved.value,
+                time_saved_unit: newTimeSavedUnit.value,
+                rate: newRate.value,
+                rate_time_unit: newRateTimeUnit.value,
+                rate_type: newRateType.value,
+                final: finalAmount.value,
+                gain: gain.value
+            }
+        }
+
         isEditing.value = false
-        editSavingsId = null
+        editSavingsId.value = null
     } else {
         const newSave = await createSaving(
             newName.value,
@@ -176,8 +194,10 @@ async function addSaving() {
         )
         savings.value.push(newSave)
     }
+
     clearForm()
 }
+
 
 async function removeSaving(id) {
     await deleteSaving(id)
@@ -203,18 +223,20 @@ function editSaving(saving) {
     newRateTimeUnit.value = saving.rate_time_unit
     newRateType.value = saving.rate_type
     isEditing.value = true
-    editSavingId.value = saving.id
+    editSavingsId.value = saving.id
 }
 
 // Clear form after editing
 function clearForm() {
-    newName.value = ''
-    newAmount.value = 0
-    newTimeSaved.value = 0
-    newTimeSavedUnit.value = ''
-    newRate.value = 0
-    newRateTimeUnit.value = ''
-    newRateType.value = ''
+    newName.value = '';
+    newAmount.value = 0;
+    newTimeSaved.value = 0;
+    newTimeSavedUnit.value = '';
+    newRate.value = 0;
+    newRateTimeUnit.value = '';
+    newRateType.value = '';
+    isEditing.value = false;
+    editSavingsId.value = null;
 }
 
 </script>
@@ -298,7 +320,7 @@ function clearForm() {
                             </span>
                         </td>
                         <td class="edit-col">
-                            <button@click="editSaving(s)">Edit</button>
+                            <button @click="editSaving(s)">Edit</button>
                         </td>
                         <td class="del-col">
                             <button @click="removeSaving(s.id)">X</button>
