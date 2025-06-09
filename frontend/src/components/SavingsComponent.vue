@@ -304,7 +304,7 @@ function clearForm() {
                         <th>At</th>
                         <th class="money-col">Final</th>
                         <th class="money-col">Gain</th>
-                        <th class="del-col">Remove</th>
+                        <th class="act-col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -319,11 +319,9 @@ function clearForm() {
                                 {{ s.gain.toFixed(2) }}
                             </span>
                         </td>
-                        <td class="edit-col">
+                        <td class="act-col">
                             <button @click="editSaving(s)">Edit</button>
-                        </td>
-                        <td class="del-col">
-                            <button @click="removeSaving(s.id)">X</button>
+                            <button @click="removeSaving(s.id)">Remove</button>
                         </td>
                     </tr>
                 </tbody>
@@ -388,7 +386,7 @@ form {
 }
 
 input,
-select,
+select,>X
 button {
     /* give them all the same base sizing */
     min-width: 120px;
@@ -441,8 +439,21 @@ button {
     text-align: right;
 }
 
-.saving-list .del-col {
-    max-width: 500px;
+.saving-list .act-col {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.saving-list .act-col button {
+    min-width: 35px;
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.2s;
 }
 
 th,
