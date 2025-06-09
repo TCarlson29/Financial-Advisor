@@ -1,1 +1,0 @@
-<!-- Renamed. This dummy file is here so the config files don't complain. -->
