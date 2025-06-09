@@ -1,6 +1,5 @@
 <!-- src/App.vue -->
 <script setup>
-import HeaderComponent from './components/HeaderComponent.vue'
 import { useRoute } from 'vue-router'
 import NavBar from './components/NavBar.vue'
 
