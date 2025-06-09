@@ -31,6 +31,9 @@ For more in depth information on how to run the files, refer to doc/development.
 * Manually entering expenses
 * Displaying expenses as table and charts/graphs
 * Expenses can be put into categories, new categories can be manually added
+* Search bars
+* Editing function
+* Graph toggle feature to switch between Bar and Pie graphs
 
 #### Budget Page
 * Budgeting table grouped by category, comparing total expenses in each category to manually entered budget goal
@@ -40,9 +43,10 @@ For more in depth information on how to run the files, refer to doc/development.
 * Manually entered savings plan (amount spend, interest, duration, etc.)
 * Automatic calculation of money gained from each savings plan
 * Table to keep track of different savings plans
+* Editing function
+* Search bars
 
 ## Todo List
-
-* Search bar for expenses and savings
-* Drop down to switch between chart types
-* Additional UI changes (color changes, page layout)
+* On savings page, per time period gain, not just total
+* On expenses page, a date system that keeps track of different months
+* On budget page, a way to keep track of budgets per month in comparison with the dates of the expenses page
