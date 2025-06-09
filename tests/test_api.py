@@ -12,7 +12,7 @@ def test_read_empty(client):
     assert response.json() == []
 
 def test_add_one(client):
-    expense = {"name": "Sample", "cost":17}
+    expense = {"name": "Sample", "category": "Food", "cost":17}
     r = client.post("/api/expenses", json=expense)
     assert r.status_code == 200 # OK
     
@@ -24,7 +24,7 @@ def test_delete_empty(client):
     assert d.status_code == 404
 
 def test_add_one_then_delete_it(client):
-    expense = {"name": "Sample", "cost":17}
+    expense = {"name": "Sample", "category": "Food", "cost":17}
     r = client.post("/api/expenses", json=expense)
     assert r.status_code == 200 # OK
     
@@ -35,7 +35,7 @@ def test_add_one_then_delete_it(client):
     assert response.json() == []
 
 def test_add_one_then_delete_other(client):
-    expense = {"name": "Sample", "cost":17}
+    expense = {"name": "Sample", "category": "Food", "cost":17}
     r = client.post("/api/expenses", json=expense)
     assert r.status_code == 200 # OK
     
@@ -43,7 +43,7 @@ def test_add_one_then_delete_other(client):
     assert d.status_code == 404
     
 def test_add_duplicate(client):
-    expense = {"name": "Sample", "cost":17}
+    expense = {"name": "Sample", "category": "Food", "cost":17}
     r1 = client.post("/api/expenses", json=expense)
     assert r1.status_code == 200 # OK
     
@@ -58,9 +58,9 @@ def test_add_duplicate(client):
     
     
 @pytest.mark.parametrize("payload,field", [
-    ({"cost":10.0, "name":42}, "name"),
-    ({"name":"Taxi", "cost":"expensive"}, "cost"),
-    ({"name":None,  "cost":None}, "name"),
+    ({"cost":10.0, "category": "Food", "name":42}, "name"),
+    ({"name":"Taxi", "category": "Food", "cost":"expensive"}, "cost"),
+    ({"name":None, "category": "Food",  "cost":None}, "name"),
 ])
 def test_create_expense_api_invalid_types(client, payload, field):
     r = client.post("/api/expenses", json=payload)

@@ -22,19 +22,22 @@ def test_expenses_entry():
         page.locator("text=Open").click()
         page.wait_for_url("**/expense-tracker")
 
-        # make sure the table really is empty
-        assert page.locator("td").count() == 0
+        # make sure the table really is empty with only 4 filter <td>
+        assert page.locator("td").count() == 4
 
         # add one…
         page.locator('input[placeholder="Expense name"]').fill("Groceries")
+        page.locator('button', has_text="Select").click()
+        page.locator('span[class="name"]', has_text="Food").click()
         page.locator('input[placeholder="Cost"]').fill("100")
         page.locator("button", has_text="Add").click()
 
-        # and assert exactly one row
+        # and assert exactly one row (plus 4 from default)
         row = page.locator("tbody tr")
-        assert row.locator("td").nth(0).inner_text() == "Groceries"
-        assert row.locator("td").nth(1).inner_text() == "100.00"
-        assert row.count() == 1
+        assert row.locator("td").nth(4).inner_text() == "Groceries"
+        assert row.locator("td").nth(5).inner_text() == "Food"
+        assert row.locator("td").nth(6).inner_text() == "100.00"
+        assert row.count() == 2
 
         browser.close()
         api.dispose()

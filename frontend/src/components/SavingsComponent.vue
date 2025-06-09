@@ -450,6 +450,9 @@ body {
 }
 
 #savings-tracker {
+    transform: scale(0.8);
+    transform-origin: 0 0;
+    width: calc(100% / 0.8);
     display: flex;
     height: 100vh;
     flex-direction: column;
@@ -528,7 +531,7 @@ button {
 /* this is your scrollable container */
 .saving-list {
     width: 100%;
-    /* flex: 1 1 auto; */
+    flex: 1 1 auto;
     margin: 0 auto;
     min-height: 0;
     max-height: none;

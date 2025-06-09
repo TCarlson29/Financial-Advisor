@@ -121,68 +121,71 @@ onMounted(async () => {
 </script>
 
 <template>
+    <h1>Expenses Tracker</h1>
     <div id="expense-tracker">
-        <div class="expense-head">
-            <h1>Expenses Tracker</h1>
-            <form @submit.prevent="addExpense">
-                <input v-model="newName" placeholder="Expense name" required />
-                <CategorySelect v-model="chosenCategory" required />
-                <input class="cost-input" v-model.number="newCost" type="number" step="any" placeholder="Cost"
-                    inputmode="decimal" required />
-                <button type="submit" id="add-expense-button">
-                    {{ currentlyEditing ? 'Update' : 'Add' }}
-                </button>
-            </form>
+        <div class="expense-data">
 
-            <h2>
-                Total: {{ totalCost.toFixed(2) }}
-            </h2>
+            <div class="expense-head">
+                <form @submit.prevent="addExpense">
+                    <input v-model="newName" placeholder="Expense name" required />
+                    <CategorySelect v-model="chosenCategory" required />
+                    <input class="cost-input" v-model.number="newCost" type="number" step="any" placeholder="Cost"
+                        inputmode="decimal" required />
+                    <button type="submit" id="add-expense-button">
+                        {{ currentlyEditing ? 'Update' : 'Add' }}
+                    </button>
+                </form>
+
+                <h2>
+                    Total: {{ totalCost.toFixed(2) }}
+                </h2>
+            </div>
+
+            <div class="expense-summary">
+
+                <div class="expense-list">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Cost</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input class="table-filter" v-model="filters.name" placeholder="Search Name" />
+                                </td>
+                                <td>
+                                    <input class="table-filter" v-model="filters.category"
+                                        placeholder="Search Category" />
+                                </td>
+                                <td>
+                                    <input class="table-filter table-filter--half" v-model.number="filters.cost_min"
+                                        type="number" step="any" placeholder="Min Cost" />
+                                    <input class="table-filter table-filter--half" v-model.number="filters.cost_max"
+                                        type="number" step="any" placeholder="Max Cost" />
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr v-for="act in expenses" :key="act.id">
+                                <td>{{ act.name }}</td>
+                                <td>{{ act.category }}</td>
+                                <td class="cost-col">{{ act.cost.toFixed(2) }}</td>
+                                <td class="action-col">
+                                    <button class="action-btn" @click="editExpense(act)">✎</button>
+                                    <button class="action-btn" @click="removeExpense(act.id)">🗑</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-
-        <div class="expense-summary">
-
-            <div class="expense-list">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Cost</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <input class="table-filter" v-model="filters.name" placeholder="Search Name" />
-                            </td>
-                            <td>
-                                <input class="table-filter" v-model="filters.category"
-                                    placeholder="Search Category" />
-                            </td>
-                            <td>
-                                <input class="table-filter table-filter--half" v-model.number="filters.cost_min"
-                                    type="number" step="any" placeholder="Min Cost" />
-                                <input class="table-filter table-filter--half" v-model.number="filters.cost_max"
-                                    type="number" step="any" placeholder="Max Cost" />
-                            </td>
-                            <td></td>
-                        </tr>
-                        <tr v-for="act in expenses" :key="act.id">
-                            <td>{{ act.name }}</td>
-                            <td>{{ act.category }}</td>
-                            <td class="cost-col">{{ act.cost.toFixed(2) }}</td>
-                            <td class = "action-col">
-                                <button @click="editExpense(act)">✎</button>
-                                <button @click="removeExpense(act.id)">🗑</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="expense-chart">
-                <Charts :chartInput="chartData" />
-            </div>
+        <div class="expense-chart">
+            <Charts :chartInput="chartData" />
         </div>
     </div>
 </template>
@@ -198,16 +201,28 @@ body {
 }
 
 #expense-tracker {
+    transform: scale(0.8);
+    transform-origin: 0 0;
+    width: calc(100% / 0.8);
     display: flex;
     flex: 0 0 auto;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     margin: 10px auto;
     padding: 1rem;
 }
 
+.expense-data {
+    display: flex;
+    /* flex: 0 0 auto; */
+    flex-direction: column;
+    align-items: center;
+    /* margin: 10px auto; */
+}
+
 
 form {
+
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -256,20 +271,20 @@ button {
 
 
 .expense-list {
-    max-height: 350px;
+    max-height: 250px;
     flex: 3 1 0;
     /* take up all remaining space */
     overflow-y: auto;
     /* scroll only when needed */
     /* optional visual styling */
     background-color: transparent;
-    border-top: 1px solid #ddd;
+    /* border-top: 1px solid #ddd; */
     margin-top: 1rem;
 }
 
 /* make the table fill its wrapper */
 .expense-list table {
-    width: 100%;
+    width: 98%;
     color: white;
     border-collapse: collapse;
     table-layout: fixed;
@@ -277,22 +292,26 @@ button {
 
 .expense-list th:nth-child(1),
 .expense-list td:nth-child(1) {
-  width: 30%; /* Name */
+    width: 30%;
+    /* Name */
 }
 
 .expense-list th:nth-child(2),
 .expense-list td:nth-child(2) {
-  width: 30%; /* Category */
+    width: 30%;
+    /* Category */
 }
 
 .expense-list th:nth-child(3),
 .expense-list td:nth-child(3) {
-  width: 25%; /* Cost */
+    width: 25%;
+    /* Cost */
 }
 
 .expense-list th:nth-child(4),
 .expense-list td:nth-child(4) {
-  width: auto; /* Actions */
+    width: auto;
+    /* Actions */
 }
 
 .expense-list thead th {
@@ -305,12 +324,18 @@ button {
 }
 
 .expense-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    justify-content: center;
+    align-items: center;
     flex: 1 1 0;
     /* overflow-y: auto; */
 }
 
 .expense-list .action-col {
-    display: flex;
+    /* display: flex; */
+    display: table-cell;
     gap: 0.25rem;
     justify-content: center;
     align-items: center;
@@ -329,8 +354,10 @@ button {
 }
 
 .action-btn {
-    width: 25%;
+    width: 50%;
 }
+
+
 
 .table-filter {
     width: 100%;
@@ -362,7 +389,7 @@ th,
 td {
     border: 1px solid #ccc;
     flex-wrap: wrap;
-    padding: 0.5rem;
+    /* padding: 0.5rem; */
 }
 
 
