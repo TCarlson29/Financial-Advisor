@@ -487,7 +487,7 @@ form {
 }
 
 input,
-select,>X
+select,
 button {
     min-width: 30px;
     padding: 0.5rem;
