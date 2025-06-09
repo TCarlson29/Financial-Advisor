@@ -350,7 +350,6 @@ function clearForm() {
                     </div>
                 </div>
             </div>
-
             <button type="submit" id="add-saving-button">{{ isEditing ? 'Update Plan' : 'Add Plan' }}</button>
         </form>
 
@@ -364,7 +363,7 @@ function clearForm() {
                         <th>At</th>
                         <th class="money-col">Final</th>
                         <th class="money-col">Gain</th>
-                        <th class="act-col">Actions</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -442,16 +441,27 @@ function clearForm() {
 
 
 <style scoped>
-#saving-tracker {
+html,
+body {
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    /* disable page-level scroll */
+}
+
+#savings-tracker {
     display: flex;
+    height: 100vh;
     flex-direction: column;
     align-items: center;
-    margin: 10px auto;
+    /* margin: 10px auto; */
     padding: 1rem;
+
 }
 
 form {
     display: flex;
+    flex: 0 0 auto;
     width: 100%;
     max-width: 1000px;
     margin: 0 auto 1rem;
@@ -466,6 +476,10 @@ form {
     color: white;
     padding: 2rem 1rem;
     background: rgba(255, 255, 255, 0.1);
+}
+
+#savings-tracker>h1 {
+    flex: 0 0 auto;
 }
 
 #savings-numbers {
@@ -514,8 +528,10 @@ button {
 /* this is your scrollable container */
 .saving-list {
     width: 100%;
+    /* flex: 1 1 auto; */
     margin: 0 auto;
-    max-height: 350px;
+    min-height: 0;
+    max-height: none;
     max-width: 80%;
     align-self: center;
     /* take up all remaining space */
@@ -526,6 +542,7 @@ button {
     color: white;
     border-top: 1px solid #ddd;
     margin-top: 1rem;
+    /* table-layout: fixed; */
 }
 
 /* make the table fill its wrapper */
@@ -549,9 +566,9 @@ button {
 
 .saving-list .act-col {
     display: flex;
-    gap: 0.5rem;
     justify-content: center;
     align-items: center;
+    gap: 0.25rem;
 }
 
 .saving-list .act-col button {
