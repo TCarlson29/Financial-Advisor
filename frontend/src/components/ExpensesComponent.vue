@@ -14,6 +14,9 @@ const totalCost = computed(() =>
     expenses.value.reduce((sum, e) => sum + (e.cost ?? 0), 0)
 )
 
+const currentlyEditing = ref(false)
+const editExpenseId = ref(null)
+
 // All filters
 const filters = reactive({
     name: '',
@@ -43,6 +46,17 @@ async function createExpense(name, category, cost) {
     return fetch(`${BASE}/api/expenses`, opts).then(r => r.json())
 }
 
+// PUT expense
+async function updateExpense(id, name, category, cost) {
+    const ops = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, category, cost })
+    }
+    const response = await fetch(`${BASE}/api/expenses/${id}`, ops)
+    return await response.json()
+}
+
 // DELETE expense
 async function deleteExpense(id) {
     await fetch(`${BASE}/api/expenses/${id}`, { method: 'DELETE' })
@@ -51,11 +65,34 @@ async function deleteExpense(id) {
 
 async function addExpense() {
     const costNum = parseFloat(newCost.value)
-    const newAct = await createExpense(newName.value, chosenCategory.value, costNum)
-    expenses.value.push(newAct)
+    if (currentlyEditing.value) {
+        const updatedExpenses = await updateExpense(
+            editExpenseId.value,
+            newName.value,
+            chosenCategory.value,
+            costNum
+        )
+        const index = expenses.value.findIndex(e => e.id === editExpenseId.value)
+        if (index !== -1) expenses.value.splice(index, 1, updatedExpenses)
+
+        currentlyEditing.value = false
+        editExpenseId.value = null
+    } else {
+        const newAct = await createExpense(newName.value, chosenCategory.value, costNum)
+        expenses.value.push(newAct)
+    }
     newName.value = ''
     chosenCategory.value = ''
     newCost.value = ''
+}
+
+// Populate the expense form
+function editExpense(expense) {
+    newName.value = expense.name
+    chosenCategory.value = expense.category
+    newCost.value = expense.cost
+    currentlyEditing.value = true
+    editExpenseId.value = expense.id
 }
 
 async function removeExpense(id) {
@@ -92,7 +129,9 @@ onMounted(async () => {
                 <CategorySelect v-model="chosenCategory" required />
                 <input class="cost-input" v-model.number="newCost" type="number" step="any" placeholder="Cost"
                     inputmode="decimal" required />
-                <button type="submit" id="add-expense-button">Add</button>
+                <button type="submit" id="add-expense-button">
+                    {{ currentlyEditing ? 'Update' : 'Add' }}
+                </button>
             </form>
 
             <h2>
@@ -109,7 +148,7 @@ onMounted(async () => {
                             <th>Name</th>
                             <th>Category</th>
                             <th>Cost</th>
-                            <th>Remove</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -133,8 +172,9 @@ onMounted(async () => {
                             <td>{{ act.name }}</td>
                             <td>{{ act.category }}</td>
                             <td class="cost-col">{{ act.cost.toFixed(2) }}</td>
-                            <td>
-                                <button class="action-btn" @click="removeExpense(act.id)">X</button>
+                            <td class = "action-col">
+                                <button @click="editExpense(act)">✎</button>
+                                <button @click="removeExpense(act.id)">🗑</button>
                             </td>
                         </tr>
                     </tbody>
@@ -235,9 +275,24 @@ button {
     table-layout: fixed;
 }
 
-.expense-list th,
-.expense-list td {
-    width: 25%;
+.expense-list th:nth-child(1),
+.expense-list td:nth-child(1) {
+  width: 30%; /* Name */
+}
+
+.expense-list th:nth-child(2),
+.expense-list td:nth-child(2) {
+  width: 30%; /* Category */
+}
+
+.expense-list th:nth-child(3),
+.expense-list td:nth-child(3) {
+  width: 25%; /* Cost */
+}
+
+.expense-list th:nth-child(4),
+.expense-list td:nth-child(4) {
+  width: auto; /* Actions */
 }
 
 .expense-list thead th {
@@ -254,7 +309,28 @@ button {
     /* overflow-y: auto; */
 }
 
+.expense-list .action-col {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+    width: 100%
+}
 
+.expense-list .action-col button {
+    flex: 1;
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.2s;
+}
+
+.action-btn {
+    width: 25%;
+}
 
 .table-filter {
     width: 100%;
@@ -289,9 +365,6 @@ td {
     padding: 0.5rem;
 }
 
-.action-btn {
-    width: 25%;
-}
 
 input[type=number] {
     -moz-appearance: textfield;

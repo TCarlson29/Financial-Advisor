@@ -20,19 +20,21 @@ const isEditing = ref(false)
 const editSavingsId = ref(null)
 
 const finalD = computed(() => {
-    return calculateFinalAmount(
-        newAmount.value,
-        newTimeSaved.value,
+    const calculatedAmount = calculateFinalAmount(
+        newAmount.value || 0,
+        newTimeSaved.value || 0,
         newTimeSavedUnit.value,
-        newRate.value,
+        newRate.value || 0,
         newRateTimeUnit.value,
         newRateType.value
     )
+    return calculatedAmount || new Decimal(0);
 })
 
-const gainD = computed(() =>
-    finalD.value.minus(newAmount.value)
-)
+const gainD = computed(() => {
+    const principal = new Decimal(newAmount.value || 0);
+    return finalD.value.minus(principal);
+})
 
 function getTimeSavedInMonths(timeSaved, timeSavedUnit) {
     const t = new Decimal(timeSaved)
@@ -66,9 +68,14 @@ function calculateFinalAmount(
     rateTimeUnit,
     rateType
 ) {
-    const P = new Decimal(principal)
-    const r = new Decimal(percentRate).dividedBy(100)
-    const n = getCorrectTimeSaved(timeSaved, timeSavedUnit, rateTimeUnit)
+    if (
+        principal === '' || timeSaved === '' || timeSavedUnit === '' ||
+        percentRate === '' || rateTimeUnit === '' || rateType === ''
+    ) return new Decimal(0)
+
+    const P = new Decimal(principal || 0)
+    const r = new Decimal(percentRate || 0).dividedBy(100)
+    const n = getCorrectTimeSaved(timeSaved || 0, timeSavedUnit, rateTimeUnit)
 
     let finalD
     if (rateType === 'Simple') {
@@ -95,6 +102,9 @@ async function createSaving(
     finalD,
     gainD
 ) {
+    const final = finalD || '0.00';
+    const gain = gainD || '0.00';
+
     const opts = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -106,8 +116,8 @@ async function createSaving(
             rate,
             rate_time_unit,
             rate_type,
-            final: finalD.value.toString(),
-            gain: gainD.value.toString()
+            final,
+            gain,
         })
     }
     return fetch(`${BASE}/api/savings`, opts).then(r => r.json())
@@ -163,8 +173,8 @@ async function addSaving() {
             newRate.value,
             newRateTimeUnit.value,
             newRateType.value,
-            finalAmount.value,
-            gain.value
+            finalD.value.toFixed(2),
+            gainD.value.toFixed(2)
         )
 
         const index = savings.value.findIndex(s => s.id === editSavingsId.value)
@@ -178,8 +188,8 @@ async function addSaving() {
                 rate: newRate.value,
                 rate_time_unit: newRateTimeUnit.value,
                 rate_type: newRateType.value,
-                final: finalAmount.value,
-                gain: gain.value
+                final: finalD.value.toFixed(2),
+                gain: gainD.value.toFixed(2)
             }
         }
 
@@ -194,8 +204,8 @@ async function addSaving() {
             newRate.value,
             newRateTimeUnit.value,
             newRateType.value,
-            finalAmount.value,
-            gain.value
+            finalD.value.toFixed(2),
+            gainD.value.toFixed(2)
         )
         savings.value.push(newSave)
     }
@@ -419,8 +429,8 @@ function clearForm() {
                             </span>
                         </td>
                         <td class="act-col">
-                            <button @click="editSaving(s)">Edit</button>
-                            <button @click="removeSaving(s.id)">Remove</button>
+                            <button @click="editSaving(s)">✎</button>
+                            <button @click="removeSaving(s.id)">🗑</button>
                         </td>
                     </tr>
                 </tbody>

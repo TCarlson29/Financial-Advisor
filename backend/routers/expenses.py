@@ -35,3 +35,14 @@ def delete_expense(
 ):
     if not crud.delete_expense(db, exp_id):
         raise HTTPException(404, "Expense not found")
+
+@router.put("/{exp_id}", response_model=schemas.ExpenseRead)
+def update_expense(
+    exp_id: int,
+    exp: schemas.ExpenseUpdate,  # Make sure you have this schema defined
+    db: Session = Depends(get_db),
+):
+    updated_expense = crud.update_expense(db, exp_id, exp)
+    if not updated_expense:
+        raise HTTPException(status_code=404, detail="Expense not found")
+    return updated_expense

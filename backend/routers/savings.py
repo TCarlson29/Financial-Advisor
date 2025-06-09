@@ -61,6 +61,17 @@ def create_savings(
 ):
     return crud.create_savings(db, s)
 
+@router.put("/{saving_id}", response_model=schemas.SavingsRead)
+def update_saving(
+    saving_id: int,
+    saving: schemas.SavingsUpdate,  # Make sure you have this schema defined
+    db: Session = Depends(get_db),
+):
+    updated_saving = crud.update_saving(db, saving_id, saving)
+    if not updated_saving:
+        raise HTTPException(status_code=404, detail="Saving not found")
+    return updated_saving
+
 @router.delete("/{s_id}", status_code=204)
 def delete_savings(
     s_id: int,

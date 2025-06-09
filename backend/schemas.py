@@ -1,6 +1,7 @@
 # schemas.py
 from pydantic import BaseModel, ConfigDict
 from decimal import Decimal
+from typing import Optional
 
 class ExpenseCreate(BaseModel):
     name: str
@@ -10,6 +11,14 @@ class ExpenseCreate(BaseModel):
 class ExpenseRead(ExpenseCreate):
     id: int
     model_config = ConfigDict(from_attributes=True)
+
+class ExpenseUpdate(BaseModel):
+    name: str
+    category: str
+    cost: float
+
+    class Config:
+        orm_mode = True
     
 class BudgetBase(BaseModel):
     category: str
@@ -43,3 +52,17 @@ class SavingsCreate(SavingsBase): ...
 class SavingsRead(SavingsBase):
     id: int
     model_config = ConfigDict(from_attributes=True)
+
+class SavingsUpdate(BaseModel):
+    name: Optional[str] = None
+    amount: Optional[float] = None
+    time_saved: Optional[float] = None
+    time_saved_unit: Optional[str] = None
+    rate: Optional[float] = None
+    rate_time_unit: Optional[str] = None
+    rate_type: Optional[str] = None
+    final: Optional[str] = None
+    gain: Optional[str] = None
+
+    class Config:
+        model_config = ConfigDict(from_attributes=True)

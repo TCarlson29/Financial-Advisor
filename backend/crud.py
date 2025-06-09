@@ -38,6 +38,17 @@ def delete_expense(db: Session, exp_id: int) -> bool:
     db.commit()
     return True
 
+def update_expense(db: Session, exp_id: int, exp_update: schemas.ExpenseUpdate):
+    expense = db.query(models.Expense).filter(models.Expense.id == exp_id).first()
+    if not expense:
+        return None
+    expense.name = exp_update.name
+    expense.category = exp_update.category
+    expense.cost = exp_update.cost
+    db.commit()
+    db.refresh(expense)
+    return expense
+
 def get_budgets(db: Session) -> list[models.Budget]:
     return db.query(models.Budget).all()
 
@@ -143,3 +154,18 @@ def delete_savings(db: Session, s_id: int) -> bool:
     db.delete(obj)
     db.commit()
     return True
+
+def update_saving(db: Session, saving_id: int, saving_update: schemas.SavingsUpdate):
+    saving = db.query(models.Savings).filter(models.Savings.id == saving_id).first()
+    if not saving:
+        return None
+
+    # Update only provided fields
+    update_data = saving_update.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(saving, key, value)
+
+    db.add(saving)
+    db.commit()
+    db.refresh(saving)
+    return saving
