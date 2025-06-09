@@ -1,5 +1,7 @@
 <script setup>
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, reactive, watch } from 'vue'
+import { debounce } from 'lodash-es';
+import Decimal from 'decimal.js'
 const BASE = "http://localhost:8000"
 
 let id = 0
@@ -18,8 +20,8 @@ const newRateType = ref('')
 const isEditing = ref(false)
 const editSavingsId = ref(null)
 
-const finalAmount = computed(() => {
-    const t = calculateFinalAmount(
+const finalD = computed(() => {
+    return calculateFinalAmount(
         newAmount.value,
         newTimeSaved.value,
         newTimeSavedUnit.value,
@@ -27,56 +29,60 @@ const finalAmount = computed(() => {
         newRateTimeUnit.value,
         newRateType.value
     )
-    return Number.isNaN(t) ? 0 : t
 })
 
-const gain = computed(() => {
-    const t = finalAmount.value - newAmount.value
-    return Number.isNaN(t) ? 0 : t
-})
+const gainD = computed(() =>
+    finalD.value.minus(newAmount.value)
+)
 
 function getTimeSavedInMonths(timeSaved, timeSavedUnit) {
-    if (timeSavedUnit === "Month") {
-        return timeSaved
-    } else if (timeSavedUnit === "Year") {
-        return timeSaved * 12
-    }
+    const t = new Decimal(timeSaved)
+    return timeSavedUnit === 'Year'
+        ? t.times(12)
+        : t
 }
 
 function getTimeSavedInYears(timeSaved, timeSavedUnit) {
-    if (timeSavedUnit === "Month") {
-        return timeSaved / 12
-    } else if (timeSavedUnit === "Year") {
-        return timeSaved
-    }
+    const t = new Decimal(timeSaved)
+    return timeSavedUnit === 'Month'
+        ? t.dividedBy(12)
+        : t
 }
 
 function getCorrectTimeSaved(timeSaved, timeSavedUnit, rateTimeUnit) {
-    let correctTimeSaved = 0
-    if (rateTimeUnit === "Year") {
-        correctTimeSaved = getTimeSavedInYears(timeSaved, timeSavedUnit)
-    } else if (rateTimeUnit === "Month") {
-        correctTimeSaved = getTimeSavedInMonths(timeSaved, timeSavedUnit)
-    }
-    if (correctTimeSaved < 1) {
-        correctTimeSaved = 0
-    }
-    return correctTimeSaved
+    let n = rateTimeUnit === 'Year'
+        ? getTimeSavedInYears(timeSaved, timeSavedUnit)
+        : getTimeSavedInMonths(timeSaved, timeSavedUnit)
+
+    n = n.floor()
+
+    return n
 }
 
-function calculateFinalAmount(principal, timeSaved, timeSavedUnit, percentRate, rateTimeUnit, rateType) {
-    const correctTimeSaved = getCorrectTimeSaved(timeSaved, timeSavedUnit, rateTimeUnit)
-    const rate = percentRate / 100
-    let final = 0
+function calculateFinalAmount(
+    principal,
+    timeSaved,
+    timeSavedUnit,
+    percentRate,
+    rateTimeUnit,
+    rateType
+) {
+    const P = new Decimal(principal)
+    const r = new Decimal(percentRate).dividedBy(100)
+    const n = getCorrectTimeSaved(timeSaved, timeSavedUnit, rateTimeUnit)
 
-    if (rateType === "Simple") {
-        final = principal * (1 + rate * correctTimeSaved)
-    } else if (rateType === "Compound") {
-        final = principal * Math.pow((1 + rate), correctTimeSaved)
+    let finalD
+    if (rateType === 'Simple') {
+        // A = P × (1 + r × n)
+        finalD = P.times(Decimal(1).plus(r.times(n)))
+    } else {
+        // A = P × (1 + r)^n
+        finalD = P.times(Decimal(1).plus(r).pow(n))
     }
 
-    return final
+    return finalD
 }
+
 
 // POST saving
 async function createSaving(
@@ -87,8 +93,8 @@ async function createSaving(
     rate,
     rate_time_unit,
     rate_type,
-    final,
-    gain
+    finalD,
+    gainD
 ) {
     const opts = {
         method: 'POST',
@@ -101,8 +107,8 @@ async function createSaving(
             rate,
             rate_time_unit,
             rate_type,
-            final,
-            gain
+            final: finalD.value.toString(),
+            gain: gainD.value.toString()
         })
     }
     return fetch(`${BASE}/api/savings`, opts).then(r => r.json())
@@ -203,15 +209,58 @@ async function removeSaving(id) {
     await deleteSaving(id)
 }
 
-onMounted(async () => {
-    await fetchSavings();
+
+const filters = reactive({
+    name: '',
+    time_saved_unit: '',
+    rate_time_unit: '',
+    rate_type: '',
+
+    amount_min: '',
+    amount_max: '',
+    time_saved_min: '',
+    time_saved_max: '',
+    rate_min: '',
+    rate_max: '',
+    final_min: '',
+    final_max: '',
+    gain_min: '',
+    gain_max: ''
 })
+
 
 // GET savings
 async function fetchSavings() {
-    const res = await fetch(`${BASE}/api/savings`)
-    savings.value = await res.json()
+    const url = new URL(`${BASE}/api/savings`);
+
+    // string filters
+    if (filters.name) url.searchParams.set("name", filters.name);
+    if (filters.time_saved_unit) url.searchParams.set("time_saved_unit", filters.time_saved_unit);
+    if (filters.rate_time_unit) url.searchParams.set("rate_time_unit", filters.rate_time_unit);
+    if (filters.rate_type) url.searchParams.set("rate_type", filters.rate_type);
+
+    // numeric range filters: only set if not empty
+    if (filters.amount_min !== "") url.searchParams.set("amount_min", filters.amount_min);
+    if (filters.amount_max !== "") url.searchParams.set("amount_max", filters.amount_max);
+    if (filters.time_saved_min !== "") url.searchParams.set("time_saved_min", filters.time_saved_min);
+    if (filters.time_saved_max !== "") url.searchParams.set("time_saved_max", filters.time_saved_max);
+    if (filters.rate_min !== "") url.searchParams.set("rate_min", filters.rate_min);
+    if (filters.rate_max !== "") url.searchParams.set("rate_max", filters.rate_max);
+    if (filters.final_min !== "") url.searchParams.set("final_min", filters.final_min);
+    if (filters.final_max !== "") url.searchParams.set("final_max", filters.final_max);
+    if (filters.gain_min !== "") url.searchParams.set("gain_min", filters.gain_min);
+    if (filters.gain_max !== "") url.searchParams.set("gain_max", filters.gain_max);
+
+    const res = await fetch(url.toString());
+    savings.value = await res.json();
 }
+
+const debouncedFetch = debounce(fetchSavings, 300);
+watch(filters, debouncedFetch);
+
+onMounted(async () => {
+    await fetchSavings();
+})
 
 // Populate form while editing
 function editSaving(saving) {
@@ -253,11 +302,13 @@ function clearForm() {
                     </div>
                     <div id="savings-amount">
                         Amount of saved money:
-                        <input v-model.number="newAmount" type="number" placeholder="0.00" required />
+                        <input v-model.number="newAmount" type="number" step="any" min="0" max="1000000000"
+                            placeholder="0.00" required />
                     </div>
                     <div id="time-saved">
                         Saving Duration:
-                        <input v-model.number="newTimeSaved" type="number" placeholder="Time Saved" required />
+                        <input v-model.number="newTimeSaved" type="number" step="any" min="0" max="150" placeholder="0"
+                            required />
 
                         <select v-model="newTimeSavedUnit" required>
                             <option disabled value=""> Time Unit</option>
@@ -266,7 +317,8 @@ function clearForm() {
                     </div>
                     <div id="savings-rate">
                         Rates of interest (%):
-                        <input v-model.number="newRate" type="number" placeholder="Rate" required />
+                        <input v-model.number="newRate" type="number" step="any" min="0" max="30" placeholder="0.00"
+                            required />
 
                         <select v-model="newRateTimeUnit" required>
                             <option disabled value=""> Time Unit</option>
@@ -282,11 +334,11 @@ function clearForm() {
                 <div id="calculated-data">
                     <div id="savings-calculated-amount">
                         Calculated Amount:
-                        <input type="number" :value="finalAmount.toFixed(2)" disabled />
+                        <input type="text" :value="finalD.toFixed(2)" disabled />
                     </div>
                     <div id="savings-gain">
                         Gain:
-                        <input type="number" :value="gain.toFixed(2)" disabled />
+                        <input type="text" :value="gainD.toFixed(2)" disabled />
                     </div>
                 </div>
             </div>
@@ -308,15 +360,64 @@ function clearForm() {
                     </tr>
                 </thead>
                 <tbody>
+                    <tr>
+                        <!-- Plan name filter -->
+                        <td>
+                            <input class="table-filter" v-model="filters.name" placeholder="Search Plan" />
+                        </td>
+
+                        <!-- Saved amount min/max -->
+                        <td>
+                            <input class="table-filter table-filter--half" v-model.number="filters.amount_min"
+                                type="number" step="any" placeholder="Min Saved" />
+                            <input class="table-filter table-filter--half" v-model.number="filters.amount_max"
+                                type="number" step="any" placeholder="Max Saved" />
+                        </td>
+
+                        <!-- Time saved min/max -->
+                        <td>
+                            <input class="table-filter table-filter--half" v-model.number="filters.time_saved_min"
+                                type="number" step="any" placeholder="Min Duration" />
+                            <input class="table-filter table-filter--half" v-model.number="filters.time_saved_max"
+                                type="number" step="any" placeholder="Max Duration" />
+                        </td>
+
+                        <!-- Rate min/max -->
+                        <td>
+                            <input class="table-filter table-filter--half" v-model.number="filters.rate_min"
+                                type="number" step="any" placeholder="Min Rate" />
+                            <input class="table-filter table-filter--half" v-model.number="filters.rate_max"
+                                type="number" step="any" placeholder="Max Rate" />
+                        </td>
+
+                        <!-- Final amount min/max -->
+                        <td>
+                            <input class="table-filter table-filter--half" v-model.number="filters.final_min"
+                                type="number" step="any" placeholder="Min Final" />
+                            <input class="table-filter table-filter--half" v-model.number="filters.final_max"
+                                type="number" step="any" placeholder="Max Final" />
+                        </td>
+
+                        <!-- Gain min/max -->
+                        <td>
+                            <input class="table-filter table-filter--half" v-model.number="filters.gain_min"
+                                type="number" step="any" placeholder="Min Gain" />
+                            <input class="table-filter table-filter--half" v-model.number="filters.gain_max"
+                                type="number" step="any" placeholder="Max Gain" />
+                        </td>
+
+                        <!-- Remove column has no filter -->
+                        <td></td>
+                    </tr>
                     <tr v-for="s in savings" :key="s.id">
                         <td>{{ s.name }}</td>
                         <td class="money-col">{{ s.amount.toFixed(2) }}</td>
                         <td>{{ s.time_saved }} {{ s.time_saved_unit }} (s)</td>
                         <td>{{ s.rate }}% per {{ s.rate_time_unit }} ({{ s.rate_type }})</td>
-                        <td class="money-col">{{ s.final.toFixed(2) }}</td>
+                        <td class="money-col">{{ s.final }}</td>
                         <td class="money-col">
                             <span :class="{ exceeded: s.gain < 0 }">
-                                {{ s.gain.toFixed(2) }}
+                                {{ s.gain }}
                             </span>
                         </td>
                         <td class="act-col">
@@ -388,8 +489,7 @@ form {
 input,
 select,>X
 button {
-    /* give them all the same base sizing */
-    min-width: 120px;
+    min-width: 30px;
     padding: 0.5rem;
     /* text-align: center; */
     /* center the placeholder / typed text */
@@ -455,6 +555,27 @@ button {
     color: white;
     transition: background-color 0.2s;
 }
+
+.action-btn {
+    width: 25%;
+}
+
+.table-filter {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 0.25rem;
+}
+
+.table-filter--half {
+    width: calc(50% - 4px);
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.table-filter--half:last-child {
+    margin-right: 0;
+}
+
 
 th,
 td {

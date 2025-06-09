@@ -1,16 +1,92 @@
-# main.py
-from fastapi import FastAPI, Depends, HTTPException, Header
+# backend/main.py
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
-from backend import crud, models, schemas, database
-from backend.database import SessionLocal, engine
+from backend.database import engine, Base, get_db, SessionLocal
+from backend.routers import expenses, budgets, categories, savings
+from backend.models import Category, Expense, Savings
+from contextlib import asynccontextmanager
+
+# Create tables
+Base.metadata.create_all(bind=engine)
 
 
-models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
-app.add_middleware( 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    db = SessionLocal()
+    try:
+        # default categories
+        defaults = ["Food", "Transport", "Entertainment", "Utilities", "Miscellaneous"]
+        for name in defaults:
+            try:
+                db.add(Category(name=name))
+                db.commit()
+            except IntegrityError:
+                db.rollback()
+
+        # default expenses
+        if db.query(Expense).count() == 0:
+            default_expenses = [
+                {"name": "Coffee",      "category": "Food",          "cost": 3.50},
+                {"name": "Monthly Metro","category": "Transport",    "cost": 50.00},
+                {"name": "Movie Ticket", "category": "Entertainment","cost": 12.00},
+            ]
+            for e in default_expenses:
+                db.add(Expense(**e))
+            db.commit()
+
+        # default savings
+        if db.query(Savings).count() == 0:
+            default_savings = [
+                {
+                    "name": "Emergency Fund",
+                    "amount": 1000.0,
+                    "time_saved": 6,
+                    "time_saved_unit": "Month",     # from timeUnits
+                    "rate": 1.5,
+                    "rate_time_unit": "Year",       # from timeUnits
+                    "rate_type": "Simple",          # from rateTypes
+                    "final": 1000.0,                # amount + (amount * rate% * (6/12))
+                    "gain": 0.0,
+                },
+                {
+                    "name": "Vacation",
+                    "amount": 2000.0,
+                    "time_saved": 1,
+                    "time_saved_unit": "Year",
+                    "rate": 2.0,
+                    "rate_time_unit": "Year",
+                    "rate_type": "Compound",
+                    "final": 2040.0,                # 2000 * (1 + 0.02)^1
+                    "gain": 40.0,
+                },
+                {
+                    "name": "Car Down Payment",
+                    "amount": 500.0,
+                    "time_saved": 12,
+                    "time_saved_unit": "Month",
+                    "rate": 1.0,
+                    "rate_time_unit": "Year",
+                    "rate_type": "Compound",
+                    "final": 505.0,                 # 500 * (1 + 0.01)^(12/12)
+                    "gain": 5.0,
+                },
+            ]
+
+            for s in default_savings:
+                db.add(Savings(**s))
+            db.commit()
+
+        yield
+
+    finally:
+        db.close()
+
+app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://localhost:8000"],
     allow_credentials=True,
@@ -18,70 +94,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def get_db():
-    db = SessionLocal()
-    try: yield db
-    finally: db.close()
-
-@app.on_event("startup")
-def seed_default_categories():
-    db = SessionLocal()
-    defaults = ["Food", "Transport", "Entertainment", "Utilities", "Miscellaneous"]
-    for name in defaults:
-        try:
-            # try insert; if unique constraint fails, ignore
-            db.add(models.Category(name=name))
-            db.commit()
-        except IntegrityError:
-            db.rollback()
-    db.close()
-
-@app.get("/api/expenses", response_model=list[schemas.ExpenseRead])
-def read_expenses(db: Session = Depends(get_db)):
-    return crud.get_expenses(db)
-
-@app.post("/api/expenses", response_model=schemas.ExpenseRead)
-def create_expense(act: schemas.ExpenseCreate, db: Session = Depends(get_db)):
-    return crud.create_expense(db, act)
-
-@app.delete("/api/expenses/{exp_id}", status_code=204)
-def delete_expense(exp_id: int, db: Session = Depends(get_db)):
-    if not crud.delete_expense(db, exp_id):
-        raise HTTPException(status_code=404, detail="Expense not found")
-
-@app.get("/api/budgets", response_model=list[schemas.BudgetRead])
-def read_budgets(db: Session = Depends(get_db)):
-    return crud.get_budgets(db)
-
-@app.post("/api/budgets", response_model=schemas.BudgetRead)
-def create_or_update_budget(bud: schemas.BudgetCreate, db: Session = Depends(get_db)):
-    return crud.upsert_budget(db, bud)
-
-@app.get("/api/categories", response_model=list[schemas.CategoryRead])
-def read_categories(db: Session = Depends(get_db)):
-    return crud.get_categories(db)
-
-@app.post("/api/categories", response_model=schemas.CategoryRead)
-def create_category(cat: schemas.CategoryCreate, db: Session = Depends(get_db)):
-    return crud.create_category(db, cat)
-
-@app.delete("/api/categories/{cat_id}", status_code=204)
-def delete_category(cat_id: int, db: Session = Depends(get_db)):
-    if not crud.delete_category(db, cat_id):
-        raise HTTPException(status_code=404, detail="Category not found")
-
-@app.get("/api/savings", response_model=list[schemas.SavingsRead])
-def read_savings(db: Session = Depends(get_db)):
-    return crud.get_savings(db)
-
-@app.post("/api/savings", response_model=schemas.SavingsRead)
-def create_savings(s: schemas.SavingsCreate, db: Session = Depends(get_db)):
-    return crud.create_savings(db, s)
-
-@app.delete("/api/savings/{s_id}", status_code=204)
-def delete_savings(s_id: int, db: Session = Depends(get_db)):
-    if not crud.delete_savings(db, s_id):
-        raise HTTPException(status_code=404, detail="Savings not found")
-
-
-
+# mount routers
+app.include_router(expenses.router)
+app.include_router(budgets.router)
+app.include_router(categories.router)
+app.include_router(savings.router)

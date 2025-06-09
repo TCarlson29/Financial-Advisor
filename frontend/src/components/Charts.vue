@@ -146,7 +146,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
-  gap: 30px;
+  gap: 2px;
   align-self: center;
   justify-content: center;
   margin-top: 2rem;
@@ -156,7 +156,7 @@ export default {
 .toggle-button {
   width: 195px;
   height: 50px;
-  padding: 0.5rem 1rem;
+  padding: 0.2rem 1rem;
   background-color: rgb(60, 130, 94);
   color: white;
   border: none;

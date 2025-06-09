@@ -77,7 +77,7 @@ async function saveBudget(cat) {
                             Within
                         </template>
                         <template v-else>
-                            Exceeded By {{ (totalsByCategory[cat] || 0) - (budgets[cat] || 0).toFixed(2) }}
+                            Exceeded By {{ ((totalsByCategory[cat] || 0) - (budgets[cat] || 0)).toFixed(2) }}
                         </template>
                     </td>
                 </tr>

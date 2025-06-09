@@ -1,5 +1,6 @@
 # schemas.py
 from pydantic import BaseModel, ConfigDict
+from decimal import Decimal
 
 class ExpenseCreate(BaseModel):
     name: str
@@ -35,8 +36,8 @@ class SavingsBase(BaseModel):
     rate: float
     rate_time_unit: str
     rate_type: str
-    final: float 
-    gain: float 
+    final: str 
+    gain: str 
     
 class SavingsCreate(SavingsBase): ...
 class SavingsRead(SavingsBase):
