@@ -17,6 +17,9 @@ const newRate = ref(0)
 const newRateTimeUnit = ref('')
 const newRateType = ref('')
 
+const isEditing = ref(false)
+const editSavingsId = ref(null)
+
 const finalD = computed(() => {
     return calculateFinalAmount(
         newAmount.value,
@@ -111,6 +114,37 @@ async function createSaving(
     return fetch(`${BASE}/api/savings`, opts).then(r => r.json())
 }
 
+// PUT savings
+async function updateSavings(
+    id,
+    name,
+    amount,
+    time_saved,
+    time_saved_unit,
+    rate,
+    rate_time_unit,
+    rate_type,
+    final,
+    gain
+) {
+    const ops = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            name,
+            amount,
+            time_saved,
+            time_saved_unit,
+            rate,
+            rate_time_unit,
+            rate_type,
+            final,
+            gain
+        })
+    }
+    const response = await fetch(`${BASE}/api/savings/${id}`, ops)
+    return await response.json()
+}
 
 // DELETE saving
 async function deleteSaving(id) {
@@ -118,27 +152,58 @@ async function deleteSaving(id) {
     savings.value = savings.value.filter(a => a.id !== id)
 }
 
+
 async function addSaving() {
-    const newSave = await createSaving(
-        newName.value,
-        newAmount.value,
-        newTimeSaved.value,
-        newTimeSavedUnit.value,
-        newRate.value,
-        newRateTimeUnit.value,
-        newRateType.value,
-        finalD,
-        gainD
-    );
-    savings.value.push(newSave)
-    newName.value = ''
-    newAmount.value = 0
-    newTimeSaved.value = 0
-    newTimeSavedUnit.value = ''
-    newRate.value = 0
-    newRateTimeUnit.value = ''
-    newRateType.value = ''
+    if (isEditing.value) {
+        await updateSavings(
+            editSavingsId.value,
+            newName.value,
+            newAmount.value,
+            newTimeSaved.value,
+            newTimeSavedUnit.value,
+            newRate.value,
+            newRateTimeUnit.value,
+            newRateType.value,
+            finalAmount.value,
+            gain.value
+        )
+
+        const index = savings.value.findIndex(s => s.id === editSavingsId.value)
+        if (index !== -1) {
+            savings.value[index] = {
+                id: editSavingsId.value,
+                name: newName.value,
+                amount: newAmount.value,
+                time_saved: newTimeSaved.value,
+                time_saved_unit: newTimeSavedUnit.value,
+                rate: newRate.value,
+                rate_time_unit: newRateTimeUnit.value,
+                rate_type: newRateType.value,
+                final: finalAmount.value,
+                gain: gain.value
+            }
+        }
+
+        isEditing.value = false
+        editSavingsId.value = null
+    } else {
+        const newSave = await createSaving(
+            newName.value,
+            newAmount.value,
+            newTimeSaved.value,
+            newTimeSavedUnit.value,
+            newRate.value,
+            newRateTimeUnit.value,
+            newRateType.value,
+            finalAmount.value,
+            gain.value
+        )
+        savings.value.push(newSave)
+    }
+
+    clearForm()
 }
+
 
 async function removeSaving(id) {
     await deleteSaving(id)
@@ -197,6 +262,31 @@ onMounted(async () => {
     await fetchSavings();
 })
 
+// Populate form while editing
+function editSaving(saving) {
+    newName.value = saving.name
+    newAmount.value = saving.amount
+    newTimeSaved.value = saving.time_saved
+    newTimeSavedUnit.value = saving.time_saved_unit
+    newRate.value = saving.rate
+    newRateTimeUnit.value = saving.rate_time_unit
+    newRateType.value = saving.rate_type
+    isEditing.value = true
+    editSavingsId.value = saving.id
+}
+
+// Clear form after editing
+function clearForm() {
+    newName.value = '';
+    newAmount.value = 0;
+    newTimeSaved.value = 0;
+    newTimeSavedUnit.value = '';
+    newRate.value = 0;
+    newRateTimeUnit.value = '';
+    newRateType.value = '';
+    isEditing.value = false;
+    editSavingsId.value = null;
+}
 
 </script>
 
@@ -253,7 +343,7 @@ onMounted(async () => {
                 </div>
             </div>
 
-            <button type="submit" id="add-saving-button">Add Plan</button>
+            <button type="submit" id="add-saving-button">{{ isEditing ? 'Update Plan' : 'Add Plan' }}</button>
         </form>
 
         <div class="saving-list">
@@ -266,7 +356,7 @@ onMounted(async () => {
                         <th>At</th>
                         <th class="money-col">Final</th>
                         <th class="money-col">Gain</th>
-                        <th class="del-col">Remove</th>
+                        <th class="act-col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -330,8 +420,9 @@ onMounted(async () => {
                                 {{ s.gain }}
                             </span>
                         </td>
-                        <td class="del-col">
-                            <button class="action-btn" @click="removeSaving(s.id)">X</button>
+                        <td class="act-col">
+                            <button @click="editSaving(s)">Edit</button>
+                            <button @click="removeSaving(s.id)">Remove</button>
                         </td>
                     </tr>
                 </tbody>
@@ -396,7 +487,7 @@ form {
 }
 
 input,
-select,
+select,>X
 button {
     min-width: 30px;
     padding: 0.5rem;
@@ -448,8 +539,21 @@ button {
     text-align: right;
 }
 
-.saving-list .del-col {
-    max-width: 500px;
+.saving-list .act-col {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.saving-list .act-col button {
+    min-width: 35px;
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.2s;
 }
 
 .action-btn {
