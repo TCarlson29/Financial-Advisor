@@ -4,7 +4,7 @@ export const menuConfig = [
   {
     path: '/',
     label: 'Home',
-    icon: 'home', // string key, for future <Icon :name="…" />
+    icon: 'home',
     order: 1,
     group: null
   },

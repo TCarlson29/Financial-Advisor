@@ -22,8 +22,6 @@ import { computed, ref } from 'vue'
 import { Bar, Pie } from 'vue-chartjs'
 import ChartJS from 'chart.js/auto'
 
-// ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale)
-
 export default {
   components: { Bar, Pie },
   name: 'Charts',
@@ -35,7 +33,6 @@ export default {
   },
   setup(props) {
 
-    // Generate distinct colors for each input
     function generateColors(count) {
       const colors = []
       for (let i = 0; i < count; i++) {

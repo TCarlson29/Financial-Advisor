@@ -17,7 +17,6 @@ const totalCost = computed(() =>
 const currentlyEditing = ref(false)
 const editExpenseId = ref(null)
 
-// All filters
 const filters = reactive({
     name: '',
     category: '',
@@ -25,7 +24,6 @@ const filters = reactive({
     cost_max: ''
 })
 
-// Chart Data
 const chartData = computed(() => {
     const map = {}
     for (const expense of expenses.value) {
@@ -36,7 +34,6 @@ const chartData = computed(() => {
 })
 
 
-// POST expense
 async function createExpense(name, category, cost) {
     const opts = {
         method: 'POST',
@@ -46,7 +43,6 @@ async function createExpense(name, category, cost) {
     return fetch(`${BASE}/api/expenses`, opts).then(r => r.json())
 }
 
-// PUT expense
 async function updateExpense(id, name, category, cost) {
     const ops = {
         method: 'PUT',
@@ -57,7 +53,6 @@ async function updateExpense(id, name, category, cost) {
     return await response.json()
 }
 
-// DELETE expense
 async function deleteExpense(id) {
     await fetch(`${BASE}/api/expenses/${id}`, { method: 'DELETE' })
     expenses.value = expenses.value.filter(a => a.id !== id)
@@ -86,7 +81,6 @@ async function addExpense() {
     newCost.value = ''
 }
 
-// Populate the expense form
 function editExpense(expense) {
     newName.value = expense.name
     chosenCategory.value = expense.category
@@ -99,8 +93,6 @@ async function removeExpense(id) {
     await deleteExpense(id)
 }
 
-
-// GET expenses
 async function fetchExpenses() {
     const url = new URL(`${BASE}/api/expenses`)
     if (filters.name) url.searchParams.set("name", filters.name)
@@ -214,10 +206,8 @@ body {
 
 .expense-data {
     display: flex;
-    /* flex: 0 0 auto; */
     flex-direction: column;
     align-items: center;
-    /* margin: 10px auto; */
 }
 
 
@@ -228,7 +218,6 @@ form {
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    /* flex-direction: row; */
     border: 2px solid #ccc;
     border-radius: 34px;
     padding: 2rem 1rem;
@@ -239,7 +228,6 @@ form {
 input,
 select,
 button {
-    /* give them all the same base sizing */
     min-width: 30px;
     padding: 0.5rem;
     border-radius: 5px;
@@ -273,16 +261,11 @@ button {
 .expense-list {
     max-height: 250px;
     flex: 3 1 0;
-    /* take up all remaining space */
     overflow-y: auto;
-    /* scroll only when needed */
-    /* optional visual styling */
     background-color: transparent;
-    /* border-top: 1px solid #ddd; */
     margin-top: 1rem;
 }
 
-/* make the table fill its wrapper */
 .expense-list table {
     width: 98%;
     color: white;
@@ -317,7 +300,6 @@ button {
 .expense-list thead th {
     position: sticky;
     top: 0;
-    /* background: white; */
     background: rgb(60, 130, 94);
     z-index: 10;
     border-bottom: 2px solid #ccc;
@@ -330,11 +312,9 @@ button {
     justify-content: center;
     align-items: center;
     flex: 1 1 0;
-    /* overflow-y: auto; */
 }
 
 .expense-list .action-col {
-    /* display: flex; */
     display: table-cell;
     gap: 0.25rem;
     justify-content: center;
@@ -389,7 +369,6 @@ th,
 td {
     border: 1px solid #ccc;
     flex-wrap: wrap;
-    /* padding: 0.5rem; */
 }
 
 

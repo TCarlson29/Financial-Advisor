@@ -6,7 +6,6 @@ const expenses = ref([])
 const budgets = reactive({})
 const categories = ref([])
 
-// load all expenses on mount
 onMounted(async () => {
     const [expRes, budRes, catRes] = await Promise.all([
         fetch(`${BASE}/api/expenses`),
@@ -20,7 +19,6 @@ onMounted(async () => {
     categories.value = categories.value.map(c => c.name)
 })
 
-// compute total spent per category
 const totalsByCategory = computed(() => {
     return expenses.value.reduce((acc, { category, cost }) => {
         acc[category] = (acc[category] || 0) + cost
@@ -28,7 +26,7 @@ const totalsByCategory = computed(() => {
     }, /** start with an empty object **/ {})
 })
 
-// save whenever a budget input changes
+
 async function saveBudget(cat) {
     const payload = { category: cat, limit: budgets[cat] }
     const res = await fetch(`${BASE}/api/budgets`, {
@@ -60,10 +58,8 @@ async function saveBudget(cat) {
                 </tr>
             </thead>
             <tbody>
-                <!-- loop over computed totals -->
                 <tr v-for="cat in categories" :key="cat">
                     <td>{{ cat }}</td>
-                    <!-- use 0 if there’s no entry yet -->
                     <td>{{ (totalsByCategory[cat] || 0).toFixed(2) }}</td>
                     <td>
                         <input type="number" min="0" v-model.number="budgets[cat]" @change="saveBudget(cat)"
@@ -72,7 +68,6 @@ async function saveBudget(cat) {
                     <td :class="{
                         'exceeded': (totalsByCategory[cat] || 0) > (budgets[cat] || 0)
                     }">
-                        <!-- within or exceeded -->
                         <template v-if="(totalsByCategory[cat] || 0) <= (budgets[cat] || 0)">
                             Within
                         </template>

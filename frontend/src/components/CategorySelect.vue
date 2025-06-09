@@ -15,7 +15,6 @@
         tabindex="-1" class="dropdown-item" @click="select(cat.name)" @keydown.enter.prevent="select(cat.name)"
         ref="items">
         <span class="name" tabindex="0">{{ cat.name }}</span>
-        <!-- stopPropagation so clicking X doesn’t select -->
         <button type="button" class="del-btn" aria-label="Delete category" @click.stop="removeCategory(cat.id)">×</button>
       </li>
       <li class="dropdown-item add-new" tabindex="0" @keydown.enter.prevent="openAddDialog()"
@@ -57,15 +56,12 @@ const trigger = ref(null)
 
 defineOptions({ inheritAttrs: true })
 
-// keep `selected` in sync with v-model
 watch(() => props.modelValue, v => selected.value = v)
 
-// grab all the <li> refs whenever the list re-renders
 onMounted(async () => {
   await fetchCategories()
 })
 
-// when `open` flips to true, collect your item-refs after the DOM updates
 watch(open, async val => {
   if (val) {
     await nextTick()
@@ -76,10 +72,9 @@ watch(open, async val => {
   }
 })
 
-// fetch existing categories
 async function fetchCategories() {
   const r = await fetch(`${BASE}/api/categories`)
-  categories.value = await r.json() // assume each has {id,name}
+  categories.value = await r.json() 
 }
 
 function toggle() {
@@ -94,7 +89,6 @@ function close() {
   trigger.value?.focus()
 }
 
-// when you select, remember to close()
 function select(name) {
   selected.value = name
   emit('update:modelValue', name)
@@ -102,12 +96,11 @@ function select(name) {
 }
 
 
-// call API to delete, then refetch (or splice locally)
 async function removeCategory(id) {
   await fetch(`${BASE}/api/categories/${id}`, { method: 'DELETE' })
   await fetchCategories()
 }
-// call API to create, then refetch + select
+
 async function confirmAdd() {
   const name = newCategory.value.trim()
   if (!name) return
@@ -132,7 +125,7 @@ function openAddDialog() {
   open.value = false
 }
 
-// keyboard movers
+
 function focusItem(i) {
   const el = items.value[i]
   if (el) el.focus()
@@ -155,7 +148,7 @@ function focusPrev() {
   width: 300px;
 }
 
-/* header bar */
+
 .dropdown-header {
   padding: 0.5em;
   width: 100%;
@@ -167,7 +160,7 @@ function focusPrev() {
   background: white;
 }
 
-/* the floating menu */
+
 .dropdown-list {
   position: absolute;
   top: 100%;
@@ -198,7 +191,6 @@ function focusPrev() {
   background: #f0f0f0;
 }
 
-/* delete button */
 .del-btn {
   border: none;
   background: transparent;
@@ -210,7 +202,6 @@ function focusPrev() {
   width: 25%;
 }
 
-/* add-new row styling */
 .add-new {
   font-style: italic;
   color: #007bff;

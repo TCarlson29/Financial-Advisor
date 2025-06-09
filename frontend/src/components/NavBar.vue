@@ -19,12 +19,10 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { menuConfig } from '@/router/menuConfig.js'
 
-// sort by order, then group by the `group` key
 const sorted = computed(() =>
     [...menuConfig].sort((a, b) => a.order - b.order)
 )
 
-// produce an object like { null: [...], Tracker: [...], Reports: [...] }
 const groupedMenus = computed(() =>
     sorted.value.reduce((acc, item) => {
         (acc[item.group] ||= []).push(item)

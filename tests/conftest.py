@@ -12,14 +12,12 @@ from backend.main import app, get_db
 import backend.models
 from backend.database import Base
 
-# Create an in-memory SQLite engine:
 _TEST_DATABASE_URL = "sqlite:///:memory:"
 engine = create_engine(
     _TEST_DATABASE_URL, connect_args={"check_same_thread": False},
     poolclass=StaticPool,# << ensures the same memory DB is used
 )
 
-# Create a sessionmaker bound to that engine:
 TestingSessionLocal  = sessionmaker(
     bind=engine,
     autoflush=False,
