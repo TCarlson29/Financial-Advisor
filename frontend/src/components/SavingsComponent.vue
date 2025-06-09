@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted, ref, computed, reactive, watch } from 'vue'
-import { debounce } from 'lodash-es';
 import Decimal from 'decimal.js'
 const BASE = "http://localhost:8000"
 
@@ -255,8 +254,7 @@ async function fetchSavings() {
     savings.value = await res.json();
 }
 
-const debouncedFetch = debounce(fetchSavings, 300);
-watch(filters, debouncedFetch);
+watch(filters, fetchSavings);
 
 onMounted(async () => {
     await fetchSavings();

@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted, ref, computed, reactive, watch } from 'vue'
-import { debounce } from 'lodash-es'
 import CategorySelect from './CategorySelect.vue'
 import Charts from './Charts.vue'
 const BASE = "http://localhost:8000"
@@ -76,9 +75,8 @@ async function fetchExpenses() {
     expenses.value = await res.json()
 }
 
-const debouncedFetch = debounce(fetchExpenses, 300)
 
-watch(filters, debouncedFetch)
+watch(filters, fetchExpenses)
 
 onMounted(async () => {
     await fetchExpenses();
